@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import '../Models/StudentModel.dart';
 import '../PagesUtils/StudentTable.dart';
 import '../Forms/StudentForm.dart';
+import '../Services/ExcelExportService.dart';
+import '../Services/ExcelImportService.dart';
+import '../Services/ExcelTemplateService.dart';
 
 class StudentPage extends StatefulWidget {
   const StudentPage({super.key});
@@ -116,13 +119,55 @@ class _StudentPageState extends State<StudentPage> {
               ),
               const Spacer(),
               OutlinedButton.icon(
-                onPressed: () {},
+                onPressed: () async {
+                  final path = await ExcelTemplateService.generateTemplate();
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Template disimpan di: $path")),
+                  );
+                },
+                icon: const Icon(Icons.download),
+                label: const Text('Template Import'),
+              ),
+              const SizedBox(width: 8),
+              OutlinedButton.icon(
+                onPressed: () async {
+                  try {
+                    final imported = await ExcelImportService.importStudents();
+
+                    if (imported.isNotEmpty) {
+                      setState(() {
+                        students.addAll(imported);
+                        filterStudents();
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Berhasil diimport"),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(e.toString()),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                },
                 icon: const Icon(Icons.upload_file),
                 label: const Text('Import Excel'),
               ),
               const SizedBox(width: 8),
               OutlinedButton.icon(
-                onPressed: () {},
+                onPressed: () async {
+                  await ExcelExportService.exportStudents(students);
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Export berhasil")),
+                  );
+                },
                 icon: const Icon(Icons.download),
                 label: const Text('Export'),
               ),
