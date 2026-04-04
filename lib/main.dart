@@ -39,7 +39,7 @@ class _MainLayoutState extends State<MainLayout> {
 
   final pages = const [
     DashboardPage(),
-    StudentsPage(),
+    StudentPage(),
     ExamCardPage(),
     DeskCardPage(),
   ];

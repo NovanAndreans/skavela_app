@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../Models/StudentModel.dart';
+import '../Widgets/CustomInputs.dart';
+
 class StudentFormDialog extends StatefulWidget {
-  const StudentFormDialog({super.key});
+  final StudentModel? student;
+
+  const StudentFormDialog({super.key, this.student});
 
   @override
   State<StudentFormDialog> createState() => _StudentFormDialogState();
@@ -21,6 +26,23 @@ class _StudentFormDialogState extends State<StudentFormDialog> {
   final ruangController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+
+    if (widget.student != null) {
+      nameController.text = widget.student!.name;
+      usernameController.text = widget.student!.username;
+      passwordController.text = widget.student!.password;
+      jurusanController.text = widget.student!.jurusan;
+      waktu1Controller.text = widget.student!.waktu1;
+      waktu2Controller.text = widget.student!.waktu2;
+      kelasController.text = widget.student!.kelas;
+      noUrutController.text = widget.student!.noUrut;
+      ruangController.text = widget.student!.ruang;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Dialog(
       child: SizedBox(
@@ -35,28 +57,30 @@ class _StudentFormDialogState extends State<StudentFormDialog> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Tambah Data Siswa Ujian',
+                    widget.student == null
+                        ? 'Tambah Data Siswa Ujian'
+                        : 'Edit Data Siswa',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 20),
 
-                  _field(nameController, 'Nama Siswa'),
+                  CustomInputText(nameController, 'Nama Siswa'),
 
                   Row(
                     children: [
-                      Expanded(child: _field(usernameController, 'Username')),
+                      Expanded(child: CustomInputText(usernameController, 'Username')),
                       const SizedBox(width: 12),
-                      Expanded(child: _field(passwordController, 'Password')),
+                      Expanded(child: CustomInputText(passwordController, 'Password')),
                     ],
                   ),
 
-                  _field(jurusanController, 'Jurusan'),
+                  CustomInputText(jurusanController, 'Jurusan'),
 
                   Row(
                     children: [
-                      Expanded(child: _field(waktu1Controller, 'Waktu Sesi 1')),
+                      Expanded(child: CustomInputText(waktu1Controller, 'Waktu Sesi 1')),
                       const SizedBox(width: 12),
-                      Expanded(child: _field(waktu2Controller, 'Waktu Sesi 2')),
+                      Expanded(child: CustomInputText(waktu2Controller, 'Waktu Sesi 2')),
                     ],
                   ),
 
@@ -64,12 +88,12 @@ class _StudentFormDialogState extends State<StudentFormDialog> {
                     children: [
                       Expanded(
                         flex: 2,
-                        child: _field(kelasController, 'Kelas'),
+                        child: CustomInputText(kelasController, 'Kelas'),
                       ),
                       const SizedBox(width: 12),
-                      Expanded(child: _field(noUrutController, 'No Urut')),
+                      Expanded(child: CustomInputText(noUrutController, 'No Urut')),
                       const SizedBox(width: 12),
-                      Expanded(child: _field(ruangController, 'Ruang')),
+                      Expanded(child: CustomInputText(ruangController, 'Ruang')),
                     ],
                   ),
 
@@ -102,17 +126,5 @@ class _StudentFormDialogState extends State<StudentFormDialog> {
     );
   }
 
-  Widget _field(TextEditingController controller, String label) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-        ),
-        validator: (v) => v == null || v.isEmpty ? 'Wajib diisi' : null,
-      ),
-    );
-  }
+  
 }
