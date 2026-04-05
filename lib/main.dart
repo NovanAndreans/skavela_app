@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'Pages/Dashboard.dart';
 import 'Pages/DeskCard.dart';
 import 'Pages/ExamCard.dart';
+import 'Pages/MajorSettingPage.dart';
 import 'Pages/StudentPage.dart';
 
 void main() {
@@ -40,6 +41,7 @@ class _MainLayoutState extends State<MainLayout> {
   final pages = const [
     DashboardPage(),
     StudentPage(),
+    MajorSettingPage(),
     ExamCardPage(),
     DeskCardPage(),
   ];
@@ -84,6 +86,11 @@ class _MainLayoutState extends State<MainLayout> {
                   icon: Icon(Icons.people_outline),
                   selectedIcon: Icon(Icons.people),
                   label: Text('Siswa'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.palette_outlined),
+                  selectedIcon: Icon(Icons.palette),
+                  label: Text('Warna Jurusan'),
                 ),
                 NavigationRailDestination(
                   icon: Icon(Icons.picture_as_pdf_outlined),
