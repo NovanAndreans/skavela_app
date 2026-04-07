@@ -2,6 +2,7 @@
 // Starter modern Flutter Desktop UI for School Admin App
 
 import 'package:flutter/material.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'Pages/Dashboard.dart';
 import 'Pages/DeskCard.dart';
@@ -10,6 +11,8 @@ import 'Pages/MajorSettingPage.dart';
 import 'Pages/StudentPage.dart';
 
 void main() {
+  sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
   runApp(const SchoolAdminApp());
 }
 

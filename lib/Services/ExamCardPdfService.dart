@@ -212,7 +212,7 @@ class ExamCardPdfService {
                           /// TABLE
                           pw.Expanded(
                             child: pw.Table(
-                              border: pw.TableBorder.all(),
+                              // border: pw.TableBorder.all(),
                               columnWidths: {
                                 0: const pw.FixedColumnWidth(105),
                                 1: const pw.FixedColumnWidth(8),

@@ -141,7 +141,7 @@ class ExamCardWidget extends StatelessWidget {
                           /// TABLE
                           Expanded(
                             child: Table(
-                              border: TableBorder.all(color: Colors.black),
+                              // border: TableBorder.all(color: Colors.black),
                               columnWidths: const {
                                 0: FixedColumnWidth(90),
                                 1: FixedColumnWidth(8),

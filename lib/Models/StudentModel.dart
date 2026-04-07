@@ -20,4 +20,32 @@ class StudentModel {
     required this.noUrut,
     required this.ruang,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      "name": name,
+      "username": username,
+      "password": password,
+      "jurusan": jurusan,
+      "kelas": kelas,
+      "noUrut": noUrut,
+      "ruang": ruang,
+      "waktu1": waktu1,
+      "waktu2": waktu2,
+    };
+  }
+
+  factory StudentModel.fromMap(Map<String, dynamic> map) {
+    return StudentModel(
+      name: map["name"],
+      username: map["username"],
+      password: map["password"],
+      jurusan: map["jurusan"],
+      kelas: map["kelas"],
+      noUrut: map["noUrut"],
+      ruang: map["ruang"],
+      waktu1: map["waktu1"],
+      waktu2: map["waktu2"],
+    );
+  }
 }

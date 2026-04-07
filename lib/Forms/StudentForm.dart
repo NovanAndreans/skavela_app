@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skavela_app/Repositories/StudentRepository.dart';
 
 import '../Models/StudentModel.dart';
 import '../Widgets/CustomInputs.dart';
@@ -68,9 +69,13 @@ class _StudentFormDialogState extends State<StudentFormDialog> {
 
                   Row(
                     children: [
-                      Expanded(child: CustomInputText(usernameController, 'Username')),
+                      Expanded(
+                        child: CustomInputText(usernameController, 'Username'),
+                      ),
                       const SizedBox(width: 12),
-                      Expanded(child: CustomInputText(passwordController, 'Password')),
+                      Expanded(
+                        child: CustomInputText(passwordController, 'Password'),
+                      ),
                     ],
                   ),
 
@@ -78,9 +83,19 @@ class _StudentFormDialogState extends State<StudentFormDialog> {
 
                   Row(
                     children: [
-                      Expanded(child: CustomInputText(waktu1Controller, 'Waktu Sesi 1')),
+                      Expanded(
+                        child: CustomInputText(
+                          waktu1Controller,
+                          'Waktu Sesi 1',
+                        ),
+                      ),
                       const SizedBox(width: 12),
-                      Expanded(child: CustomInputText(waktu2Controller, 'Waktu Sesi 2')),
+                      Expanded(
+                        child: CustomInputText(
+                          waktu2Controller,
+                          'Waktu Sesi 2',
+                        ),
+                      ),
                     ],
                   ),
 
@@ -91,9 +106,13 @@ class _StudentFormDialogState extends State<StudentFormDialog> {
                         child: CustomInputText(kelasController, 'Kelas'),
                       ),
                       const SizedBox(width: 12),
-                      Expanded(child: CustomInputText(noUrutController, 'No Urut')),
+                      Expanded(
+                        child: CustomInputText(noUrutController, 'No Urut'),
+                      ),
                       const SizedBox(width: 12),
-                      Expanded(child: CustomInputText(ruangController, 'Ruang')),
+                      Expanded(
+                        child: CustomInputText(ruangController, 'Ruang'),
+                      ),
                     ],
                   ),
 
@@ -108,8 +127,26 @@ class _StudentFormDialogState extends State<StudentFormDialog> {
                       ),
                       const SizedBox(width: 8),
                       ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if (_formKey.currentState!.validate()) {
+                            final student = StudentModel(
+                              name: nameController.text,
+                              username: usernameController.text,
+                              password: passwordController.text,
+                              jurusan: jurusanController.text,
+                              kelas: kelasController.text,
+                              noUrut: noUrutController.text,
+                              ruang: ruangController.text,
+                              waktu1: waktu1Controller.text,
+                              waktu2: waktu2Controller.text,
+                            );
+
+                            if (widget.student == null) {
+                              await StudentRepository.insert(student);
+                            } else {
+                              await StudentRepository.update(student);
+                            }
+
                             Navigator.pop(context);
                           }
                         },
@@ -125,6 +162,4 @@ class _StudentFormDialogState extends State<StudentFormDialog> {
       ),
     );
   }
-
-  
 }

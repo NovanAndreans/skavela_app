@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
+import 'package:skavela_app/Repositories/StudentRepository.dart';
 
 import '../Models/StudentModel.dart';
 
@@ -226,8 +227,12 @@ class _StudentTableState extends State<StudentTable> {
                                             child: const Text("Batal"),
                                           ),
                                           ElevatedButton(
-                                            onPressed: () =>
-                                                Navigator.pop(context, true),
+                                            onPressed: () {
+                                              StudentRepository.delete(
+                                                student.username,
+                                              );
+                                              Navigator.pop(context, true);
+                                            },
                                             child: const Text("Hapus"),
                                           ),
                                         ],

@@ -1,39 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
 import 'package:skavela_app/Models/StudentModel.dart';
+import '../Repositories/StudentRepository.dart';
 import '../Services/ExamCardPdfService.dart';
 import '../Widgets/ExamCardWidget.dart';
 
 import 'package:flutter/material.dart';
 import '../Widgets/ExamCardWidget.dart';
 
-class ExamCardPage extends StatelessWidget {
+class ExamCardPage extends StatefulWidget {
   const ExamCardPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final dummy = List.generate(
-      25,
-      (i) => StudentModel(
-        name: "Nama Siswa $i",
-        username: "SMK000$i",
-        password: "SMK000$i",
-        jurusan: "Desain Komunikasi Visual",
-        kelas: "XII DKV",
-        noUrut: "No Urut ${i + 1}",
-        ruang: "Lab 20",
-        waktu1: "07.30 - 09.00",
-        waktu2: "09.30 - 11.00",
-      ),
-    );
+  State<ExamCardPage> createState() => _ExamCardPageState();
+}
 
+class _ExamCardPageState extends State<ExamCardPage> {
+  List<StudentModel> students = [];
+
+  @override
+  void initState() {
+    super.initState();
+    load();
+  }
+
+  void load() async {
+    students = await StudentRepository.getAll();
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       children: [
         Container(
           margin: EdgeInsets.all(3),
           child: ElevatedButton(
             onPressed: () async {
-              final pdf = await ExamCardPdfService.generate(dummy);
+              final pdf = await ExamCardPdfService.generate(students);
 
               await Printing.layoutPdf(onLayout: (format) => pdf);
             },
@@ -47,14 +51,14 @@ class ExamCardPage extends StatelessWidget {
             height: 700,
             color: Colors.grey.shade200,
             child: GridView.builder(
-              itemCount: dummy.length,
+              itemCount: students.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
                 childAspectRatio: 260 / 170,
               ),
               itemBuilder: (_, i) => Container(
                 margin: EdgeInsets.all(2.4),
-                child: ExamCardWidget(student: dummy[i]),
+                child: ExamCardWidget(student: students[i]),
               ),
             ),
           ),

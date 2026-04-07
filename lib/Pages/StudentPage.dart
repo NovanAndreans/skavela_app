@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../Models/StudentModel.dart';
 import '../PagesUtils/StudentTable.dart';
 import '../Forms/StudentForm.dart';
+import '../Repositories/StudentRepository.dart';
 import '../Services/ExcelExportService.dart';
 import '../Services/ExcelImportService.dart';
 import '../Services/ExcelTemplateService.dart';
@@ -15,19 +16,7 @@ class StudentPage extends StatefulWidget {
 }
 
 class _StudentPageState extends State<StudentPage> {
-  List<StudentModel> students = [
-    StudentModel(
-      name: "Anastasya Dwi Putri Maharani",
-      username: "SMK0071874989",
-      password: "SMK0071874989",
-      jurusan: "Desain Produksi Busana",
-      waktu1: "07.30 - 09.00 WIB",
-      waktu2: "09.30 - 11.00 WIB",
-      kelas: "XII DPB 1",
-      noUrut: "1",
-      ruang: "Lab 20",
-    ),
-  ];
+  List<StudentModel> students = [];
 
   void editStudent(int index) async {
     final result = await showDialog<StudentModel>(
@@ -69,8 +58,18 @@ class _StudentPageState extends State<StudentPage> {
     super.initState();
     filteredStudents = students;
 
+    loadData();
+
     searchController.addListener(() {
       filterStudents();
+    });
+  }
+
+  void loadData() async {
+    List<StudentModel> studentsLoad = await StudentRepository.getAll();
+    setState(() {
+      students = studentsLoad;
+      filteredStudents = studentsLoad;
     });
   }
 
