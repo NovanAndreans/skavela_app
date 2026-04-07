@@ -12,7 +12,7 @@ class ExamCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = getMajorColor(student.jurusan);
+    // final color = getMajorColor(student.jurusan);
 
     return Container(
       width: 260,

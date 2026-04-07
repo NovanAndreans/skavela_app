@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'dart:typed_data';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -5,10 +7,6 @@ import 'package:skavela_app/Utils/AppImages.dart';
 
 import '../Models/StudentModel.dart';
 
-import 'dart:typed_data';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
-import '../Models/StudentModel.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 import '../Utils/AppSetting.dart';

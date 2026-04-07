@@ -1,11 +1,10 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
 import 'package:skavela_app/Models/StudentModel.dart';
 import '../Repositories/StudentRepository.dart';
 import '../Services/ExamCardPdfService.dart';
-import '../Widgets/ExamCardWidget.dart';
-
-import 'package:flutter/material.dart';
 import '../Widgets/ExamCardWidget.dart';
 
 class ExamCardPage extends StatefulWidget {

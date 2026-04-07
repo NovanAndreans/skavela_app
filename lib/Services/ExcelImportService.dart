@@ -54,7 +54,7 @@ class ExcelImportService {
 
     final sheet = excel.tables.values.first;
 
-    final header = sheet!.rows.first;
+    final header = sheet.rows.first;
 
     if (!validateHeader(header)) {
       throw Exception("Format Excel tidak sesuai template");
@@ -62,7 +62,7 @@ class ExcelImportService {
 
     List<StudentModel> students = [];
 
-    for (int i = 1; i < sheet!.rows.length; i++) {
+    for (int i = 1; i < sheet.rows.length; i++) {
       final row = sheet.rows[i];
       StudentModel newStudent = StudentModel(
           name: row[1]?.value.toString() ?? '',

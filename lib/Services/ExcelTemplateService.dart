@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:excel/excel.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -29,9 +28,9 @@ class ExcelTemplateService {
     final directory = await getApplicationDocumentsDirectory();
     final filePath = '${directory.path}/Template_Data_Siswa.xlsx';
 
-    final file = File(filePath)
-      ..createSync(recursive: true)
-      ..writeAsBytesSync(excel.encode()!);
+    // final file = File(filePath)
+    //   ..createSync(recursive: true)
+    //   ..writeAsBytesSync(excel.encode()!);
 
     return filePath;
   }
