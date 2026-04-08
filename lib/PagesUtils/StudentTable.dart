@@ -6,7 +6,7 @@ import '../Models/StudentModel.dart';
 
 class StudentTable extends StatefulWidget {
   final List<StudentModel> students;
-  final Function(int index) onDelete;
+  final Function(String index) onDelete;
   final Function(int index) onEdit;
 
   const StudentTable({
@@ -241,7 +241,7 @@ class _StudentTableState extends State<StudentTable> {
                                   );
 
                                   if (confirm == true) {
-                                    widget.onDelete(index);
+                                    widget.onDelete(student.username);
                                   }
                                 },
                               ),

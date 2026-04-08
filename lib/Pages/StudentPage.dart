@@ -26,15 +26,19 @@ class _StudentPageState extends State<StudentPage> {
 
     if (result != null) {
       setState(() {
-        students[index] = result;
+        refresh();
       });
     }
   }
 
-  void deleteStudent(int index) {
-    setState(() {
-      students.removeAt(index);
-    });
+  void deleteStudent(String username) {
+    StudentRepository.delete(username);
+    refresh();
+  }
+
+  void refresh() async {
+    students = await StudentRepository.getAll();
+    setState(() {});
   }
 
   final TextEditingController searchController = TextEditingController();
@@ -87,11 +91,13 @@ class _StudentPageState extends State<StudentPage> {
               ),
               const Spacer(),
               ElevatedButton.icon(
-                onPressed: () {
-                  showDialog(
+                onPressed: () async {
+                  final result = await showDialog(
                     context: context,
                     builder: (_) => const StudentFormDialog(),
                   );
+
+                  if (result == true) refresh();
                 },
                 icon: const Icon(Icons.add),
                 label: const Text('Tambah'),
