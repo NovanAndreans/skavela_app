@@ -1,14 +1,11 @@
 // ignore_for_file: file_names
-
 import 'dart:typed_data';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 import 'package:skavela_app/Utils/AppImages.dart';
-
 import '../Models/StudentModel.dart';
-
 import 'package:flutter/services.dart' show rootBundle;
-
 import '../Utils/AppSetting.dart';
 
 Future<pw.MemoryImage> loadImage(String path) async {
@@ -18,71 +15,84 @@ Future<pw.MemoryImage> loadImage(String path) async {
 
 class ExamCardPdfService {
   static Future<Uint8List> generate(List<StudentModel> students) async {
-    final pdf = pw.Document();
-
     final logo1 = await loadImage(appImages.logoMalang);
     final logo2 = await loadImage(appImages.logoSMK);
     final wm = await loadImage(appImages.logoWM);
 
-    // loop per 9 data
-    for (int i = 0; i < students.length; i += 9) {
-      final chunk = students.skip(i).take(9).toList();
+    final pdf = pw.Document();
 
-      pdf.addPage(
-        pw.Page(
-          pageFormat: PdfPageFormat(
-            330 * PdfPageFormat.mm,
-            210 * PdfPageFormat.mm,
-          ),
-          build: (context) {
-            return pw.Stack(
-              children: [
-                /// WATERMARK
-                pw.Positioned.fill(
-                  child: pw.Center(
-                    child: pw.Transform.rotate(
-                      angle: -0.5,
-                      child: pw.Opacity(
-                        opacity: 0.08,
-                        child: pw.Text(
-                          "Asistensi Mengajar UM x SKAVELA 2026",
-                          style: pw.TextStyle(
-                            fontSize: 50,
-                            fontWeight: pw.FontWeight.bold,
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async {
+
+        const margin = 6.0;
+        const spacing = 4.0;
+
+        final pageFormat = format.copyWith(
+          marginLeft: margin,
+          marginRight: margin,
+          marginTop: margin,
+          marginBottom: margin,
+        );
+
+        final cardWidth =
+            (pageFormat.availableWidth - (spacing * 2)) / 3;
+
+        final cardHeight =
+            (pageFormat.availableHeight - (spacing * 2)) / 3;
+
+        const cardsPerPage = 9;
+
+        for (int i = 0; i < students.length; i += cardsPerPage) {
+          final chunk = students.skip(i).take(cardsPerPage).toList();
+
+          pdf.addPage(
+            pw.Page(
+              pageFormat: pageFormat,
+              build: (context) {
+                return pw.Stack(
+                  children: [
+
+                    /// WATERMARK
+                    pw.Positioned.fill(
+                      child: pw.Center(
+                        child: pw.Transform.rotate(
+                          angle: -0.5,
+                          child: pw.Opacity(
+                            opacity: 0.08,
+                            child: pw.Text(
+                              "Asistensi Mengajar UM x SKAVELA 2026",
+                              style: pw.TextStyle(
+                                fontSize: cardWidth * 0.18,
+                                fontWeight: pw.FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ),
 
-                /// GRID 3x3
-                pw.Column(
-                  children: List.generate(3, (row) {
-                    return pw.Expanded(
-                      child: pw.Row(
-                        children: List.generate(3, (col) {
-                          final index = row * 3 + col;
+                    /// GRID
+                    pw.Wrap(
+                      spacing: spacing,
+                      runSpacing: spacing,
+                      children: chunk.map((s) {
+                        return pw.Container(
+                          width: cardWidth,
+                          height: cardHeight,
+                          child: _card(s, logo1, logo2, wm),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                );
+              },
+            ),
+          );
+        }
 
-                          return pw.Expanded(
-                            child: pw.Padding(
-                              padding: const pw.EdgeInsets.all(4),
-                              child: index < chunk.length
-                                  ? _card(chunk[index], logo1, logo2, wm)
-                                  : pw.Container(),
-                            ),
-                          );
-                        }),
-                      ),
-                    );
-                  }),
-                ),
-              ],
-            );
-          },
-        ),
-      );
-    }
+        return pdf.save();
+      },
+    );
 
     return pdf.save();
   }
@@ -93,39 +103,29 @@ class ExamCardPdfService {
     pw.MemoryImage logo2,
     pw.MemoryImage logo3,
   ) {
-    return pw.Container(
-      // width: 70 * PdfPageFormat.mm,
-      // height: 110 * PdfPageFormat.mm,
-      // width: double.infinity,
-      // height: double.infinity,
-      padding: const pw.EdgeInsets.all(2),
-      decoration: pw.BoxDecoration(border: pw.Border.all(width: 1)),
-      child: pw.Column(
-        children: [
-          /// ================= HEADER =================
-          pw.Column(
-            children: [
-              pw.Padding(
-                padding: const pw.EdgeInsets.all(2),
-                child: pw.Row(
+    return pw.FittedBox(
+      child: pw.Container(
+        padding: const pw.EdgeInsets.all(2),
+        decoration: pw.BoxDecoration(border: pw.Border.all(width: 1)),
+        child: pw.Column(
+          children: [
+
+            /// HEADER
+            pw.Column(
+              children: [
+                pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   children: [
-                    pw.Container(
-                      margin: pw.EdgeInsets.all(3),
-                      child: pw.Image(logo1, width: 35, height: 45),
-                    ), // ganti image kalau ada
+                    pw.Image(logo1, width: 35, height: 45),
                     pw.Column(
                       children: [
-                        pw.Text(
-                          "KARTU PESERTA PSAJ",
-                          style: pw.TextStyle(fontSize: 11),
-                        ),
+                        pw.Text("KARTU PESERTA PSAJ",
+                            style: pw.TextStyle(fontSize: 11)),
                         pw.Text(
                           "SMK NEGERI 7 KOTA MALANG",
                           style: pw.TextStyle(
-                            fontSize: 13,
-                            fontWeight: pw.FontWeight.bold,
-                          ),
+                              fontSize: 13,
+                              fontWeight: pw.FontWeight.bold),
                         ),
                         pw.Text(
                           "Tahun Ajaran ${Appsetting.tahunAjaran}",
@@ -133,116 +133,75 @@ class ExamCardPdfService {
                         ),
                       ],
                     ),
-                    pw.Container(
-                      margin: pw.EdgeInsets.all(3),
-                      child: pw.Image(logo2, width: 38, height: 41),
-                    ),
+                    pw.Image(logo2, width: 38, height: 41),
                   ],
                 ),
-              ),
-
-              pw.Divider(height: 1),
-
-              pw.Padding(
-                padding: const pw.EdgeInsets.all(2),
-                child: pw.Text(
+                pw.Divider(),
+                pw.Text(
                   "Link Ujian : ${Appsetting.linkUjian}",
                   style: const pw.TextStyle(fontSize: 11),
                 ),
-              ),
+                pw.Divider(),
+              ],
+            ),
 
-              pw.Divider(height: 1),
-            ],
-          ),
-
-          /// ================= BODY =================
-          pw.Expanded(
-            child: pw.Row(
-              children: [
-                /// LEFT CONTENT
-                pw.Expanded(
-                  child: pw.Stack(
-                    alignment: pw.Alignment.centerRight,
-                    children: [
-                      pw.Container(
-                        margin: pw.EdgeInsets.all(3),
-                        child: pw.Image(logo3, width: 48, height: 51),
-                      ),
-                      pw.Column(
-                        children: [
-                          /// RUANG + WAKTU + NO
-                          pw.Padding(
-                            padding: const pw.EdgeInsets.all(2),
-                            child: pw.Row(
-                              mainAxisAlignment:
-                                  pw.MainAxisAlignment.spaceBetween,
+            /// BODY
+            pw.Expanded(
+              child: pw.Row(
+                children: [
+                  pw.Expanded(
+                    child: pw.Column(
+                      children: [
+                        pw.Row(
+                          mainAxisAlignment:
+                              pw.MainAxisAlignment.spaceBetween,
+                          children: [
+                            pw.Text("Ruang : ${s.ruang}",
+                                style: const pw.TextStyle(fontSize: 12)),
+                            pw.Column(
                               children: [
-                                pw.Text(
-                                  "Ruang : ${s.ruang}",
-                                  style: const pw.TextStyle(fontSize: 12),
-                                ),
-                                pw.Column(
-                                  children: [
-                                    pw.Text(
-                                      s.waktu1,
-                                      style: const pw.TextStyle(fontSize: 11),
-                                    ),
-                                    pw.Text(
-                                      s.waktu2,
-                                      style: const pw.TextStyle(fontSize: 11),
-                                    ),
-                                  ],
-                                ),
-                                pw.Text(
-                                  s.noUrut,
-                                  style: pw.TextStyle(
-                                    fontSize: 11,
-                                    color: PdfColors.red,
-                                    fontWeight: pw.FontWeight.bold,
-                                  ),
-                                ),
+                                pw.Text(s.waktu1,
+                                    style:
+                                        const pw.TextStyle(fontSize: 11)),
+                                pw.Text(s.waktu2,
+                                    style:
+                                        const pw.TextStyle(fontSize: 11)),
                               ],
                             ),
-                          ),
-
-                          pw.Divider(height: 1),
-
-                          /// TABLE
-                          pw.Expanded(
-                            child: pw.Table(
-                              // border: pw.TableBorder.all(),
-                              columnWidths: {
-                                0: const pw.FixedColumnWidth(105),
-                                1: const pw.FixedColumnWidth(8),
-                                2: const pw.FlexColumnWidth(),
-                              },
-                              children: [
-                                _row("Nama", s.name),
-                                _row("Username", s.username),
-                                _row("Password", s.password),
-                                _row("Konsentrasi Keahlian", s.jurusan),
-                              ],
+                            pw.Text(
+                              s.noUrut,
+                              style: pw.TextStyle(
+                                fontSize: 11,
+                                color: PdfColors.red,
+                                fontWeight: pw.FontWeight.bold,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                        pw.Divider(),
+                        pw.Table(
+                          columnWidths: {
+                            0: const pw.FlexColumnWidth(2),
+                            1: const pw.FixedColumnWidth(5),
+                            2: const pw.FlexColumnWidth(3),
+                          },
+                          children: [
+                            _row("Nama", s.name),
+                            _row("Username", s.username),
+                            _row("Password", s.password),
+                            _row("Konsentrasi", s.jurusan),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
 
-                /// SIDE COLOR (HANYA BODY)
-                pw.Container(
-                  decoration: pw.BoxDecoration(
-                    border: pw.Border.all(),
+                  pw.Container(
+                    width: 12,
                     color: PdfColors.grey400,
-                  ),
-                  width: 12 * PdfPageFormat.mm,
-                  height: double.infinity,
-                  // color: , // bisa kamu map dari jurusan juga
-                  child: pw.Center(
-                    child: pw.Transform.rotate(
-                      angle: 1.57,
-                      child: pw.FittedBox(
+                    child: pw.Center(
+                      child: pw.Transform.rotate(
+                        angle: 1.57,
                         child: pw.Text(
                           s.kelas,
                           style: pw.TextStyle(
@@ -253,11 +212,11 @@ class ExamCardPdfService {
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -266,16 +225,13 @@ class ExamCardPdfService {
     return pw.TableRow(
       children: [
         pw.Padding(
-          padding: const pw.EdgeInsets.all(4.53),
-          child: pw.Text(label, style: const pw.TextStyle(fontSize: 10)),
+          padding: const pw.EdgeInsets.all(3),
+          child: pw.Text(label),
         ),
+        pw.Text(":"),
         pw.Padding(
-          padding: const pw.EdgeInsets.all(2),
-          child: pw.Text(":", style: const pw.TextStyle(fontSize: 10)),
-        ),
-        pw.Padding(
-          padding: const pw.EdgeInsets.all(4.53),
-          child: pw.Text(value, style: const pw.TextStyle(fontSize: 10)),
+          padding: const pw.EdgeInsets.all(3),
+          child: pw.Text(value),
         ),
       ],
     );
