@@ -7,6 +7,7 @@ import '../Repositories/StudentRepository.dart';
 import '../Services/ExcelExportService.dart';
 import '../Services/ExcelImportService.dart';
 import '../Services/ExcelTemplateService.dart';
+import '../Utils/AppLoading.dart';
 
 class StudentPage extends StatefulWidget {
   const StudentPage({super.key});
@@ -145,6 +146,7 @@ class _StudentPageState extends State<StudentPage> {
               OutlinedButton.icon(
                 onPressed: () async {
                   try {
+                    AppLoading.show("Mengimpor data...");
                     final imported = await ExcelImportService.importStudents();
 
                     if (imported.isNotEmpty) {
@@ -166,6 +168,9 @@ class _StudentPageState extends State<StudentPage> {
                         backgroundColor: Colors.red,
                       ),
                     );
+                    AppLoading.hide();
+                  } finally {
+                    AppLoading.hide();
                   }
                 },
                 icon: const Icon(Icons.upload_file),
@@ -174,7 +179,12 @@ class _StudentPageState extends State<StudentPage> {
               const SizedBox(width: 8),
               OutlinedButton.icon(
                 onPressed: () async {
-                  await ExcelExportService.exportStudents(students);
+                  try {
+                    AppLoading.show("Mengekspor data...");
+                    await ExcelExportService.exportStudents(students);
+                  } finally {
+                    AppLoading.hide();
+                  }
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("Export berhasil")),

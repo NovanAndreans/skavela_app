@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:skavela_app/Models/StudentModel.dart';
 import 'package:skavela_app/Repositories/StudentRepository.dart';
 import 'package:skavela_app/Services/DeskCardPdfService.dart';
+import 'package:skavela_app/Utils/AppLoading.dart';
 
 import '../Widgets/DeskCardWidget.dart';
 
@@ -34,7 +35,13 @@ class _DeskCardPageState extends State<DeskCardPage> {
         actions: [
           ElevatedButton.icon(
             onPressed: () async {
-              await DeskCardPdfService.generate(students);
+              try {
+                AppLoading.show("Mengekspor Kartu Meja...");
+
+                await DeskCardPdfService.generate(students);
+              } finally {
+                AppLoading.hide();
+              }
             },
             icon: const Icon(Icons.picture_as_pdf),
             label: const Text("Export PDF"),

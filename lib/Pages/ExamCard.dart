@@ -5,6 +5,7 @@ import 'package:printing/printing.dart';
 import 'package:skavela_app/Models/StudentModel.dart';
 import '../Repositories/StudentRepository.dart';
 import '../Services/ExamCardPdfService.dart';
+import '../Utils/AppLoading.dart';
 import '../Widgets/ExamCardWidget.dart';
 
 class ExamCardPage extends StatefulWidget {
@@ -38,7 +39,13 @@ class _ExamCardPageState extends State<ExamCardPage> {
             onPressed: () async {
               final pdf = await ExamCardPdfService.generate(students);
 
-              await Printing.layoutPdf(onLayout: (format) => pdf);
+              try {
+                AppLoading.show("Mengekspor Kartu Ujian...");
+
+                await Printing.layoutPdf(onLayout: (format) => pdf);
+              } finally {
+                AppLoading.hide();
+              }
             },
             child: const Text("Export PDF"),
           ),

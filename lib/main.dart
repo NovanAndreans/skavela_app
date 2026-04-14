@@ -9,6 +9,7 @@ import 'Pages/DeskCard.dart';
 import 'Pages/ExamCard.dart';
 import 'Pages/MajorSettingPage.dart';
 import 'Pages/StudentPage.dart';
+import 'Widgets/LoadingOverlay.dart';
 
 void main() {
   sqfliteFfiInit();
@@ -25,7 +26,7 @@ class SchoolAdminApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'School Admin',
       theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.indigo),
-      home: const MainLayout(),
+      home: const LoadingOverlay(child: MainLayout()),
     );
   }
 }
