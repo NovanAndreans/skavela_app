@@ -18,6 +18,9 @@ class StudentPage extends StatefulWidget {
 class _StudentPageState extends State<StudentPage> {
   List<StudentModel> students = [];
 
+  Set<String> selectedUsernames = {};
+  bool isAllSelected = false;
+
   void editStudent(int index) async {
     final result = await showDialog<StudentModel>(
       context: context,
@@ -37,8 +40,12 @@ class _StudentPageState extends State<StudentPage> {
   }
 
   void refresh() async {
-    students = await StudentRepository.getAll();
-    setState(() {});
+    final data = await StudentRepository.getAll();
+
+    setState(() {
+      students = data;
+      filteredStudents = data; // 🔥 INI YANG KURANG
+    });
   }
 
   final TextEditingController searchController = TextEditingController();
@@ -176,6 +183,61 @@ class _StudentPageState extends State<StudentPage> {
                 icon: const Icon(Icons.download),
                 label: const Text('Export'),
               ),
+              const SizedBox(width: 8),
+              ElevatedButton.icon(
+                onPressed: selectedUsernames.isEmpty
+                    ? null
+                    : () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text("Konfirmasi Hapus"),
+                              content: Text(
+                                "Yakin ingin menghapus ${selectedUsernames.length} siswa terpilih?",
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, false),
+                                  child: const Text("Batal"),
+                                ),
+                                ElevatedButton(
+                                  // style: ElevatedButton.styleFrom(
+                                  //   backgroundColor: Colors.red,
+                                  // ),
+                                  onPressed: () => Navigator.pop(context, true),
+                                  child: const Text("Hapus"),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+
+                        // 🔥 jika user klik "Hapus"
+                        if (confirm == true) {
+                          await StudentRepository.deleteMany(
+                            selectedUsernames.toList(),
+                          );
+
+                          setState(() {
+                            selectedUsernames.clear();
+                            isAllSelected = false;
+                          });
+
+                          refresh();
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Data berhasil dihapus"),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        }
+                      },
+                icon: const Icon(Icons.delete),
+                label: const Text("Hapus Terpilih"),
+              ),
             ],
           ),
 
@@ -186,6 +248,14 @@ class _StudentPageState extends State<StudentPage> {
               students: filteredStudents,
               onDelete: deleteStudent,
               onEdit: editStudent,
+              onSelectionChanged: (selected, allSelected) {
+                setState(() {
+                  selectedUsernames = selected;
+                  isAllSelected = allSelected;
+                });
+              },
+              selectedUsernames: selectedUsernames,
+              isAllSelected: isAllSelected,
             ),
           ),
         ],

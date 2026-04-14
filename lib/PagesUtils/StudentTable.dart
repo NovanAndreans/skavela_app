@@ -8,12 +8,19 @@ class StudentTable extends StatefulWidget {
   final List<StudentModel> students;
   final Function(String index) onDelete;
   final Function(int index) onEdit;
+  final Function(Set<String>, bool) onSelectionChanged;
+
+  final Set<String> selectedUsernames;
+  final bool isAllSelected;
 
   const StudentTable({
     super.key,
     required this.students,
     required this.onDelete,
     required this.onEdit,
+    required this.onSelectionChanged,
+    required this.selectedUsernames,
+    required this.isAllSelected,
   });
 
   @override
@@ -46,6 +53,24 @@ class _StudentTableState extends State<StudentTable> {
   @override
   Widget build(BuildContext context) {
     final columns = <DataColumn>[
+      DataColumn2(
+        size: ColumnSize.S,
+        label: Checkbox(
+          value: widget.isAllSelected,
+          onChanged: (value) {
+            final newAll = value ?? false;
+            Set<String> newSelected;
+
+            if (newAll) {
+              newSelected = widget.students.map((e) => e.username).toSet();
+            } else {
+              newSelected = {};
+            }
+
+            widget.onSelectionChanged(newSelected, newAll);
+          },
+        ),
+      ),
       const DataColumn2(size: ColumnSize.S, label: Text('No')),
       DataColumn2(
         size: ColumnSize.L,
@@ -160,6 +185,29 @@ class _StudentTableState extends State<StudentTable> {
                       final student = entry.value;
 
                       final cells = <DataCell>[
+                        DataCell(
+                          Checkbox(
+                            value: widget.selectedUsernames.contains(
+                              student.username,
+                            ),
+                            onChanged: (value) {
+                              final newSelected = Set<String>.from(
+                                widget.selectedUsernames,
+                              );
+
+                              if (value == true) {
+                                newSelected.add(student.username);
+                              } else {
+                                newSelected.remove(student.username);
+                              }
+
+                              final newAll =
+                                  newSelected.length == widget.students.length;
+
+                              widget.onSelectionChanged(newSelected, newAll);
+                            },
+                          ),
+                        ),
                         DataCell(Text('${index + 1}')),
                         DataCell(Text(student.name)),
                       ];

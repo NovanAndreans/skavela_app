@@ -62,4 +62,16 @@ class StudentRepository {
     final db = await AppDatabase.instance();
     await db.delete("students");
   }
+
+  static Future<void> deleteMany(List<String> usernames) async {
+    final db = await AppDatabase.instance();
+
+    final batch = db.batch();
+
+    for (var username in usernames) {
+      batch.delete("students", where: "username = ?", whereArgs: [username]);
+    }
+
+    await batch.commit(noResult: true);
+  }
 }
