@@ -24,12 +24,14 @@ class DeskCardPdfService {
         const cardsPerPage = 12;
 
         // pakai ukuran kertas dari printer
-        final pageFormat = format.copyWith(
+        final pageFormat = PdfPageFormat(
+          210 * PdfPageFormat.mm, // width F4
+          330 * PdfPageFormat.mm, // height F4
           marginLeft: margin,
           marginRight: margin,
           marginTop: margin,
           marginBottom: margin,
-        );
+        ).landscape;
 
         final cardWidth = (pageFormat.availableWidth - (spacing * 2)) / 3;
 
@@ -120,7 +122,7 @@ class DeskCardPdfService {
             child: pw.Text(
               "Link Ujian : cbt.smkn7mlg.sch.id",
               style: const pw.TextStyle(fontSize: 9),
-              textAlign: pw.TextAlign.center
+              textAlign: pw.TextAlign.center,
             ),
           ),
           pw.Divider(height: 1),
