@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
 import 'package:skavela_app/Models/StudentModel.dart';
+import 'package:skavela_app/Repositories/ConfigRepository.dart';
+import '../Models/AppConfig.dart';
 import '../Repositories/StudentRepository.dart';
 import '../Services/ExamCardPdfService.dart';
 import '../Utils/AppLoading.dart';
@@ -17,6 +19,13 @@ class ExamCardPage extends StatefulWidget {
 
 class _ExamCardPageState extends State<ExamCardPage> {
   List<StudentModel> students = [];
+  AppConfig config = AppConfig(
+    examTitle: "Kartu Peserta PSAJ",
+    schoolName: "SMKN 7 MALANG",
+    year: "2025/2026",
+    examLink: "cbt.smkn7malang.sch.id",
+    deskTitle: "Penilaian Sumatif Akhir Jenjang",
+  );
 
   @override
   void initState() {
@@ -26,6 +35,7 @@ class _ExamCardPageState extends State<ExamCardPage> {
 
   void load() async {
     students = await StudentRepository.getAll();
+    config = await ConfigRepository.get();
     setState(() {});
   }
 
@@ -64,7 +74,7 @@ class _ExamCardPageState extends State<ExamCardPage> {
               ),
               itemBuilder: (_, i) => Container(
                 margin: EdgeInsets.all(2.4),
-                child: ExamCardWidget(student: students[i]),
+                child: ExamCardWidget(student: students[i], config: config),
               ),
             ),
           ),

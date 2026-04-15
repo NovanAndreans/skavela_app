@@ -3,6 +3,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:skavela_app/Utils/AppImages.dart';
 
+import '../Models/AppConfig.dart';
 import '../Models/StudentModel.dart';
 
 import 'dart:typed_data';
@@ -11,6 +12,7 @@ import 'package:pdf/widgets.dart' as pw;
 import '../Models/StudentModel.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
+import '../Repositories/ConfigRepository.dart';
 import '../Utils/AppSetting.dart';
 
 Future<pw.MemoryImage> loadImage(String path) async {
@@ -25,6 +27,9 @@ class ExamCardPdfService {
     final logo1 = await loadImage(appImages.logoMalang);
     final logo2 = await loadImage(appImages.logoSMK);
     final wm = await loadImage(appImages.logoWM);
+
+    AppConfig config;
+    config = await ConfigRepository.get();
 
     // loop per 9 data
     for (int i = 0; i < students.length; i += 9) {
@@ -70,7 +75,13 @@ class ExamCardPdfService {
                             child: pw.Padding(
                               padding: const pw.EdgeInsets.all(4),
                               child: index < chunk.length
-                                  ? _card(chunk[index], logo1, logo2, wm)
+                                  ? _card(
+                                      chunk[index],
+                                      logo1,
+                                      logo2,
+                                      wm,
+                                      config,
+                                    )
                                   : pw.Container(),
                             ),
                           );
@@ -94,6 +105,7 @@ class ExamCardPdfService {
     pw.MemoryImage logo1,
     pw.MemoryImage logo2,
     pw.MemoryImage logo3,
+    AppConfig config,
   ) {
     return pw.Container(
       // width: 70 * PdfPageFormat.mm,
@@ -119,18 +131,18 @@ class ExamCardPdfService {
                     pw.Column(
                       children: [
                         pw.Text(
-                          "KARTU PESERTA PSAJ",
+                          config.examTitle,
                           style: pw.TextStyle(fontSize: 11),
                         ),
                         pw.Text(
-                          "SMK NEGERI 7 KOTA MALANG",
+                          config.schoolName,
                           style: pw.TextStyle(
                             fontSize: 13,
                             fontWeight: pw.FontWeight.bold,
                           ),
                         ),
                         pw.Text(
-                          "Tahun Ajaran ${Appsetting.tahunAjaran}",
+                          config.year,
                           style: const pw.TextStyle(fontSize: 11),
                         ),
                       ],
@@ -148,7 +160,7 @@ class ExamCardPdfService {
               pw.Padding(
                 padding: const pw.EdgeInsets.all(2),
                 child: pw.Text(
-                  "Link Ujian : ${Appsetting.linkUjian}",
+                  config.examLink,
                   style: const pw.TextStyle(fontSize: 11),
                 ),
               ),

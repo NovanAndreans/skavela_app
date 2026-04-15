@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skavela_app/Models/AppConfig.dart';
 import 'package:skavela_app/Utils/AppSetting.dart';
 import '../Models/StudentModel.dart';
 import '../Utils/MajorColorHelper.dart';
@@ -7,8 +8,13 @@ import '../Utils/AppImages.dart';
 
 class ExamCardWidget extends StatelessWidget {
   final StudentModel student;
+  final AppConfig config;
 
-  const ExamCardWidget({super.key, required this.student});
+  const ExamCardWidget({
+    super.key,
+    required this.student,
+    required this.config,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -36,23 +42,17 @@ class ExamCardWidget extends StatelessWidget {
                       height: 45,
                     ),
                   ),
-                  const Column(
+                  Column(
                     children: [
                       Text(
-                        "KARTU PESERTA PSAJ",
+                        config.examTitle,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 9,
                         ),
                       ),
-                      Text(
-                        "SMK NEGERI 7 Kota Malang",
-                        style: TextStyle(fontSize: 8),
-                      ),
-                      Text(
-                        "Tahun Ajaran ${Appsetting.tahunAjaran}",
-                        style: TextStyle(fontSize: 8),
-                      ),
+                      Text(config.schoolName, style: TextStyle(fontSize: 8)),
+                      Text(config.year, style: TextStyle(fontSize: 8)),
                     ],
                   ),
                   Container(
@@ -71,7 +71,7 @@ class ExamCardWidget extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(3),
                 child: Text(
-                  "Link Ujian : ${Appsetting.linkUjian}",
+                  config.examLink,
                   style: const TextStyle(fontSize: 8),
                 ),
               ),

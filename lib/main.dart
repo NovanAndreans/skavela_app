@@ -2,6 +2,7 @@
 // Starter modern Flutter Desktop UI for School Admin App
 
 import 'package:flutter/material.dart';
+import 'package:skavela_app/Pages/ConfigPage.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'Pages/Dashboard.dart';
@@ -46,6 +47,7 @@ class _MainLayoutState extends State<MainLayout> {
     DashboardPage(),
     StudentPage(),
     MajorSettingPage(),
+    ConfigPage(),
     ExamCardPage(),
     DeskCardPage(),
   ];
@@ -95,6 +97,11 @@ class _MainLayoutState extends State<MainLayout> {
                   icon: Icon(Icons.palette_outlined),
                   selectedIcon: Icon(Icons.palette),
                   label: Text('Warna Jurusan'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.settings_outlined),
+                  selectedIcon: Icon(Icons.settings),
+                  label: Text('Pengaturan'),
                 ),
                 NavigationRailDestination(
                   icon: Icon(Icons.picture_as_pdf_outlined),

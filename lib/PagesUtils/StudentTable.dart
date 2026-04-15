@@ -40,6 +40,8 @@ class _StudentTableState extends State<StudentTable> {
   };
 
   int rowsPerPage = 10;
+  int currentPage = 0;
+
   int? sortColumnIndex;
   bool sortAscending = true;
 
@@ -51,7 +53,26 @@ class _StudentTableState extends State<StudentTable> {
   }
 
   @override
+  void didUpdateWidget(covariant StudentTable oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // reset page jika data berubah
+    if (oldWidget.students.length != widget.students.length) {
+      currentPage = 0;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final startIndex = currentPage * rowsPerPage;
+    final paginatedStudents = widget.students
+        .skip(startIndex)
+        .take(rowsPerPage)
+        .toList();
+
+    final totalPages =
+        (widget.students.length / rowsPerPage).ceil();
+
     final columns = <DataColumn>[
       DataColumn2(
         size: ColumnSize.S,
@@ -62,7 +83,8 @@ class _StudentTableState extends State<StudentTable> {
             Set<String> newSelected;
 
             if (newAll) {
-              newSelected = widget.students.map((e) => e.username).toSet();
+              newSelected =
+                  widget.students.map((e) => e.username).toSet();
             } else {
               newSelected = {};
             }
@@ -75,7 +97,8 @@ class _StudentTableState extends State<StudentTable> {
       DataColumn2(
         size: ColumnSize.L,
         label: const Text('Nama Siswa'),
-        onSort: (columnIndex, ascending) => onSort(columnIndex, ascending),
+        onSort: (columnIndex, ascending) =>
+            onSort(columnIndex, ascending),
       ),
     ];
 
@@ -114,7 +137,8 @@ class _StudentTableState extends State<StudentTable> {
         DataColumn2(
           size: ColumnSize.M,
           label: const Text('Kelas'),
-          onSort: (columnIndex, ascending) => onSort(columnIndex, ascending),
+          onSort: (columnIndex, ascending) =>
+              onSort(columnIndex, ascending),
         ),
       );
     }
@@ -125,18 +149,25 @@ class _StudentTableState extends State<StudentTable> {
           size: ColumnSize.M,
           label: const Text('No Urut'),
           numeric: true,
-          onSort: (columnIndex, ascending) => onSort(columnIndex, ascending),
+          onSort: (columnIndex, ascending) =>
+              onSort(columnIndex, ascending),
         ),
       );
     }
 
     if (columnVisibility["ruang"]!) {
-      columns.add(const DataColumn2(size: ColumnSize.S, label: Text('Ruang')));
+      columns.add(
+        const DataColumn2(size: ColumnSize.S, label: Text('Ruang')),
+      );
     }
 
-    columns.add(const DataColumn2(size: ColumnSize.M, label: Text('Aksi')));
+    columns.add(
+      const DataColumn2(size: ColumnSize.M, label: Text('Aksi')),
+    );
+
     return Column(
       children: [
+        /// 🔽 COLUMN TOGGLE
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -154,12 +185,15 @@ class _StudentTableState extends State<StudentTable> {
               },
               onSelected: (key) {
                 setState(() {
-                  columnVisibility[key] = !columnVisibility[key]!;
+                  columnVisibility[key] =
+                      !columnVisibility[key]!;
                 });
               },
             ),
           ],
         ),
+
+        /// 🔽 TABLE
         Expanded(
           child: Card(
             elevation: 0,
@@ -171,146 +205,158 @@ class _StudentTableState extends State<StudentTable> {
                 minWidth: 1200,
                 columnSpacing: 16,
                 horizontalMargin: 12,
-                // dataRowMinHeight: 36,
-                // dataRowMaxHeight: 40,
                 headingRowHeight: 42,
                 columns: columns,
-                rows: widget.students
-                    .take(rowsPerPage)
-                    .toList()
+                rows: paginatedStudents
                     .asMap()
                     .entries
                     .map((entry) {
-                      final index = entry.key;
-                      final student = entry.value;
+                  final index = entry.key;
+                  final student = entry.value;
 
-                      final cells = <DataCell>[
-                        DataCell(
-                          Checkbox(
-                            value: widget.selectedUsernames.contains(
-                              student.username,
-                            ),
-                            onChanged: (value) {
-                              final newSelected = Set<String>.from(
-                                widget.selectedUsernames,
-                              );
+                  final cells = <DataCell>[
+                    DataCell(
+                      Checkbox(
+                        value: widget.selectedUsernames
+                            .contains(student.username),
+                        onChanged: (value) {
+                          final newSelected = Set<String>.from(
+                              widget.selectedUsernames);
 
-                              if (value == true) {
-                                newSelected.add(student.username);
-                              } else {
-                                newSelected.remove(student.username);
-                              }
+                          if (value == true) {
+                            newSelected.add(student.username);
+                          } else {
+                            newSelected
+                                .remove(student.username);
+                          }
 
-                              final newAll =
-                                  newSelected.length == widget.students.length;
+                          final newAll =
+                              newSelected.length ==
+                                  widget.students.length;
 
-                              widget.onSelectionChanged(newSelected, newAll);
+                          widget.onSelectionChanged(
+                              newSelected, newAll);
+                        },
+                      ),
+                    ),
+                    DataCell(Text(
+                        '${startIndex + index + 1}')),
+                    DataCell(Text(student.name)),
+                  ];
+
+                  if (columnVisibility["username"]!) {
+                    cells.add(
+                        DataCell(Text(student.username)));
+                  }
+
+                  if (columnVisibility["password"]!) {
+                    cells.add(
+                        DataCell(Text(student.password)));
+                  }
+
+                  if (columnVisibility["jurusan"]!) {
+                    cells.add(
+                        DataCell(Text(student.jurusan)));
+                  }
+
+                  if (columnVisibility["waktu1"]!) {
+                    cells.add(
+                        DataCell(Text(student.waktu1)));
+                  }
+
+                  if (columnVisibility["waktu2"]!) {
+                    cells.add(
+                        DataCell(Text(student.waktu2)));
+                  }
+
+                  if (columnVisibility["kelas"]!) {
+                    cells.add(
+                        DataCell(Text(student.kelas)));
+                  }
+
+                  if (columnVisibility["noUrut"]!) {
+                    cells.add(
+                        DataCell(Text(student.noUrut)));
+                  }
+
+                  if (columnVisibility["ruang"]!) {
+                    cells.add(
+                        DataCell(Text(student.ruang)));
+                  }
+
+                  /// 🔽 ACTION BUTTON
+                  cells.add(
+                    DataCell(
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                                Icons.edit_outlined,
+                                size: 18),
+                            onPressed: () {
+                              widget.onEdit(index);
                             },
                           ),
-                        ),
-                        DataCell(Text('${index + 1}')),
-                        DataCell(Text(student.name)),
-                      ];
-
-                      if (columnVisibility["username"]!) {
-                        cells.add(DataCell(Text(student.username)));
-                      }
-
-                      if (columnVisibility["password"]!) {
-                        cells.add(DataCell(Text(student.password)));
-                      }
-
-                      if (columnVisibility["jurusan"]!) {
-                        cells.add(DataCell(Text(student.jurusan)));
-                      }
-
-                      if (columnVisibility["waktu1"]!) {
-                        cells.add(DataCell(Text(student.waktu1)));
-                      }
-
-                      if (columnVisibility["waktu2"]!) {
-                        cells.add(DataCell(Text(student.waktu2)));
-                      }
-
-                      if (columnVisibility["kelas"]!) {
-                        cells.add(DataCell(Text(student.kelas)));
-                      }
-
-                      if (columnVisibility["noUrut"]!) {
-                        cells.add(DataCell(Text(student.noUrut)));
-                      }
-
-                      if (columnVisibility["ruang"]!) {
-                        cells.add(DataCell(Text(student.ruang)));
-                      }
-
-                      cells.add(
-                        DataCell(
-                          Row(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.edit_outlined, size: 18),
-                                onPressed: () {
-                                  widget.onEdit(index);
-                                },
-                              ),
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.delete_outline,
-                                  size: 18,
-                                ),
-                                onPressed: () async {
-                                  final confirm = await showDialog<bool>(
-                                    context: context,
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        title: const Text("Hapus Data"),
-                                        content: const Text(
-                                          "Apakah Anda yakin ingin menghapus data siswa ini?",
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () =>
-                                                Navigator.pop(context, false),
-                                            child: const Text("Batal"),
-                                          ),
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              StudentRepository.delete(
-                                                student.username,
-                                              );
-                                              Navigator.pop(context, true);
-                                            },
-                                            child: const Text("Hapus"),
-                                          ),
-                                        ],
-                                      );
-                                    },
+                          IconButton(
+                            icon: const Icon(
+                                Icons.delete_outline,
+                                size: 18),
+                            onPressed: () async {
+                              final confirm =
+                                  await showDialog<bool>(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title:
+                                        const Text("Hapus Data"),
+                                    content: const Text(
+                                        "Yakin ingin menghapus data ini?"),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(
+                                                context, false),
+                                        child:
+                                            const Text("Batal"),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.pop(
+                                              context, true);
+                                        },
+                                        child:
+                                            const Text("Hapus"),
+                                      ),
+                                    ],
                                   );
-
-                                  if (confirm == true) {
-                                    widget.onDelete(student.username);
-                                  }
                                 },
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
+                              );
 
-                      return DataRow(cells: cells);
-                    })
-                    .toList(),
+                              if (confirm == true) {
+                                widget.onDelete(
+                                    student.username);
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+
+                  return DataRow(cells: cells);
+                }).toList(),
               ),
             ),
           ),
         ),
-        const SizedBox(height: 8),
+
+        /// 🔽 PAGINATION
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             const Text("Rows per page: "),
             const SizedBox(width: 8),
+
             DropdownButton<int>(
               value: rowsPerPage,
               items: const [
@@ -323,9 +369,39 @@ class _StudentTableState extends State<StudentTable> {
               onChanged: (value) {
                 setState(() {
                   rowsPerPage = value!;
+                  currentPage = 0;
                 });
               },
             ),
+
+            const SizedBox(width: 16),
+
+            IconButton(
+              icon: const Icon(Icons.chevron_left),
+              onPressed: currentPage > 0
+                  ? () {
+                      setState(() {
+                        currentPage--;
+                      });
+                    }
+                  : null,
+            ),
+
+            Text("Page ${currentPage + 1} / $totalPages"),
+
+            IconButton(
+              icon: const Icon(Icons.chevron_right),
+              onPressed:
+                  (currentPage + 1) * rowsPerPage <
+                          widget.students.length
+                      ? () {
+                          setState(() {
+                            currentPage++;
+                          });
+                        }
+                      : null,
+            ),
+
             const SizedBox(width: 16),
           ],
         ),

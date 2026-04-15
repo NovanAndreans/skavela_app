@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:skavela_app/Models/AppConfig.dart';
 import 'package:skavela_app/Models/StudentModel.dart';
 import 'package:skavela_app/Utils/AppImages.dart';
 
 class DeskCardWidget extends StatelessWidget {
   final StudentModel student;
+  final AppConfig config;
 
-  const DeskCardWidget({super.key, required this.student});
+  const DeskCardWidget({super.key, required this.student, required this.config});
 
   @override
   Widget build(BuildContext context) {
@@ -30,21 +32,21 @@ class DeskCardWidget extends StatelessWidget {
                 ),
                 Expanded(
                   child: Column(
-                    children: const [
+                    children: [
                       Text(
-                        "PENILAIAN SUMATIF AKHIR JENJANG",
+                        config.deskTitle,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        "TAHUN AJARAN 2025 - 2026",
+                        config.year,
                         style: TextStyle(fontSize: 12),
                       ),
                       Text(
-                        "SMK NEGERI 7 MALANG",
+                        config.schoolName,
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
@@ -64,10 +66,10 @@ class DeskCardWidget extends StatelessWidget {
 
           const Divider(height: 1),
 
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(vertical: 4),
             child: Text(
-              "Link Ujian : cbt.smkn7mlg.sch.id",
+              config.examLink,
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 12),
             ),

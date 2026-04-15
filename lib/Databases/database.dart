@@ -10,6 +10,7 @@ class AppDatabase {
 
     final dir = await getApplicationDocumentsDirectory();
     final path = join(dir.path, "school_admin.db");
+    print(path);
 
     _db = await openDatabase(
       path,
@@ -27,7 +28,16 @@ class AppDatabase {
           ruang TEXT,
           waktu1 TEXT,
           waktu2 TEXT
-        )
+        );
+
+        CREATE TABLE config(
+          id INTEGER PRIMARY KEY,
+          examTitle TEXT,
+          schoolName TEXT,
+          year TEXT,
+          examLink TEXT,
+          deskTitle TEXT
+        );
         """);
       },
     );

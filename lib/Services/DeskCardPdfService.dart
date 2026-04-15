@@ -3,7 +3,10 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:skavela_app/Models/StudentModel.dart';
 import 'package:skavela_app/Utils/AppImages.dart';
+import 'package:skavela_app/Models/AppConfig.dart';
 import 'package:flutter/services.dart' show rootBundle;
+
+import '../Repositories/ConfigRepository.dart';
 
 Future<pw.MemoryImage> loadImage(String path) async {
   final bytes = await rootBundle.load(path);
@@ -15,11 +18,14 @@ class DeskCardPdfService {
     final logo1 = await loadImage(appImages.logoMalang);
     final logo2 = await loadImage(appImages.logoSMK);
 
+    AppConfig config;
+    config = await ConfigRepository.get();
+
     await Printing.layoutPdf(
       onLayout: (PdfPageFormat format) async {
         final pdf = pw.Document();
 
-        const margin = 1.0 * PdfPageFormat.cm;
+        const margin = 0.25 * PdfPageFormat.cm;
         const spacing = 4.0;
         const cardsPerPage = 12;
 
@@ -59,7 +65,7 @@ class DeskCardPdfService {
                       decoration: pw.BoxDecoration(
                         border: pw.Border.all(width: 1),
                       ),
-                      child: _card(s, logo1, logo2),
+                      child: _card(s, logo1, logo2, config),
                     );
                   }).toList(),
                 );
@@ -77,6 +83,7 @@ class DeskCardPdfService {
     StudentModel s,
     pw.MemoryImage logo1,
     pw.MemoryImage logo2,
+    AppConfig config,
   ) {
     return pw.SizedBox.expand(
       child: pw.Column(
@@ -92,18 +99,18 @@ class DeskCardPdfService {
                 pw.Column(
                   children: [
                     pw.Text(
-                      "PENILAIAN SUMATIF AKHIR JENJANG",
+                      config.deskTitle,
                       style: pw.TextStyle(
                         fontSize: 9,
                         fontWeight: pw.FontWeight.bold,
                       ),
                     ),
                     pw.Text(
-                      "TAHUN AJARAN 2025 - 2026",
+                      config.year,
                       style: const pw.TextStyle(fontSize: 8),
                     ),
                     pw.Text(
-                      "SMK NEGERI 7 MALANG",
+                      config.schoolName,
                       style: pw.TextStyle(
                         fontSize: 10,
                         fontWeight: pw.FontWeight.bold,
@@ -120,7 +127,7 @@ class DeskCardPdfService {
           pw.Container(
             margin: pw.EdgeInsets.all(2),
             child: pw.Text(
-              "Link Ujian : cbt.smkn7mlg.sch.id",
+              config.examLink,
               style: const pw.TextStyle(fontSize: 9),
               textAlign: pw.TextAlign.center,
             ),

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:skavela_app/Models/AppConfig.dart';
 import 'package:skavela_app/Models/StudentModel.dart';
 import 'package:skavela_app/Repositories/StudentRepository.dart';
 import 'package:skavela_app/Services/DeskCardPdfService.dart';
 import 'package:skavela_app/Utils/AppLoading.dart';
 
+import '../Repositories/ConfigRepository.dart';
 import '../Widgets/DeskCardWidget.dart';
 
 class DeskCardPage extends StatefulWidget {
@@ -15,6 +17,13 @@ class DeskCardPage extends StatefulWidget {
 
 class _DeskCardPageState extends State<DeskCardPage> {
   List<StudentModel> students = [];
+  AppConfig config = AppConfig(
+    examTitle: "Kartu Peserta PSAJ",
+    schoolName: "SMKN 7 MALANG",
+    year: "2025/2026",
+    examLink: "cbt.smkn7malang.sch.id",
+    deskTitle: "Penilaian Sumatif Akhir Jenjang",
+  );
 
   @override
   void initState() {
@@ -24,6 +33,7 @@ class _DeskCardPageState extends State<DeskCardPage> {
 
   void load() async {
     students = await StudentRepository.getAll();
+    config = await ConfigRepository.get();
     setState(() {});
   }
 
@@ -60,7 +70,7 @@ class _DeskCardPageState extends State<DeskCardPage> {
             childAspectRatio: 1.7,
           ),
           itemBuilder: (context, index) {
-            return DeskCardWidget(student: students[index]);
+            return DeskCardWidget(student: students[index], config: config);
           },
         ),
       ),
