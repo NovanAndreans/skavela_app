@@ -11,7 +11,6 @@ class AppDatabase {
 
     final dir = await getApplicationDocumentsDirectory();
     final path = join(dir.path, "school_admin.db");
-    print(path);
 
     _db = await openDatabase(
       path,

@@ -32,7 +32,7 @@ class DeskCardPdfService {
 
         const margin = 0.25 * PdfPageFormat.cm;
         const spacing = 4.0;
-        const cardsPerPage = 12;
+        // const cardsPerPage = 12;
 
         // pakai ukuran kertas dari printer
         final pageFormat = PdfPageFormat(
@@ -48,7 +48,7 @@ class DeskCardPdfService {
 
         final cardHeight = (pageFormat.availableHeight - (spacing * 3)) / 4;
 
-        final totalPages = (students.length / cardsPerPage).ceil();
+        // final totalPages = (students.length / cardsPerPage).ceil();
 
         pdf.addPage(
           pw.MultiPage(

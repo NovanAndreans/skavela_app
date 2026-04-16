@@ -15,7 +15,7 @@ class LoadingOverlay extends StatelessWidget {
 
         ValueListenableBuilder<bool>(
           valueListenable: AppLoading.isLoading,
-          builder: (_, isLoading, __) {
+          builder: (_, isLoading, _) {
             if (!isLoading) return const SizedBox();
 
             return Container(
@@ -29,7 +29,7 @@ class LoadingOverlay extends StatelessWidget {
                   ),
                   child: ValueListenableBuilder<String>(
                     valueListenable: AppLoading.message,
-                    builder: (_, msg, __) {
+                    builder: (_, msg, _) {
                       return Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [

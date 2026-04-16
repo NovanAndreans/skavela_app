@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:skavela_app/Models/AppConfig.dart';
 import 'package:skavela_app/Models/MajorModel.dart';
-import 'package:skavela_app/Utils/AppSetting.dart';
 import '../Models/StudentModel.dart';
 import '../Utils/MajorColorHelper.dart';
 

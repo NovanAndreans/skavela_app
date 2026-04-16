@@ -2,20 +2,13 @@ import 'dart:typed_data';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:skavela_app/Utils/AppImages.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 import '../Models/AppConfig.dart';
 import '../Models/MajorModel.dart';
 import '../Models/StudentModel.dart';
-
-import 'dart:typed_data';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
-import '../Models/StudentModel.dart';
-import 'package:flutter/services.dart' show rootBundle;
-
 import '../Repositories/ConfigRepository.dart';
 import '../Repositories/MajorRepository.dart';
-import '../Utils/AppSetting.dart';
 
 Future<pw.MemoryImage> loadImage(String path) async {
   final bytes = await rootBundle.load(path);
