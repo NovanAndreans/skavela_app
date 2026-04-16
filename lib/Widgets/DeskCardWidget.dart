@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:skavela_app/Models/AppConfig.dart';
+import 'package:skavela_app/Models/MajorModel.dart';
 import 'package:skavela_app/Models/StudentModel.dart';
 import 'package:skavela_app/Utils/AppImages.dart';
+
+import '../Utils/MajorColorHelper.dart';
 
 class DeskCardWidget extends StatelessWidget {
   final StudentModel student;
   final AppConfig config;
+  final List<Major> majors;
 
-  const DeskCardWidget({super.key, required this.student, required this.config});
+  const DeskCardWidget({
+    super.key,
+    required this.student,
+    required this.config,
+    required this.majors,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -41,10 +50,7 @@ class DeskCardWidget extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text(
-                        config.year,
-                        style: TextStyle(fontSize: 12),
-                      ),
+                      Text(config.year, style: TextStyle(fontSize: 12)),
                       Text(
                         config.schoolName,
                         style: TextStyle(
@@ -102,7 +108,10 @@ class DeskCardWidget extends StatelessWidget {
               TableRow(
                 children: [
                   _label("Konsli / Kelas"),
-                  _value(student.jurusan, background: Colors.orange.shade200),
+                  _value(
+                    student.jurusan,
+                    background: getMajorColor(majors, student.jurusan),
+                  ),
                 ],
               ),
             ],

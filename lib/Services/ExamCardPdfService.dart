@@ -4,6 +4,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:skavela_app/Utils/AppImages.dart';
 
 import '../Models/AppConfig.dart';
+import '../Models/MajorModel.dart';
 import '../Models/StudentModel.dart';
 
 import 'dart:typed_data';
@@ -13,6 +14,7 @@ import '../Models/StudentModel.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 import '../Repositories/ConfigRepository.dart';
+import '../Repositories/MajorRepository.dart';
 import '../Utils/AppSetting.dart';
 
 Future<pw.MemoryImage> loadImage(String path) async {
@@ -30,6 +32,9 @@ class ExamCardPdfService {
 
     AppConfig config;
     config = await ConfigRepository.get();
+
+    List<Major> majors;
+    majors = await MajorRepository.getAll();
 
     // loop per 9 data
     for (int i = 0; i < students.length; i += 9) {
@@ -81,6 +86,7 @@ class ExamCardPdfService {
                                       logo2,
                                       wm,
                                       config,
+                                      majors,
                                     )
                                   : pw.Container(),
                             ),
@@ -106,7 +112,9 @@ class ExamCardPdfService {
     pw.MemoryImage logo2,
     pw.MemoryImage logo3,
     AppConfig config,
+    List<Major> majors,
   ) {
+    final major = majors.firstWhere((m) => m.name == s.jurusan);
     return pw.Container(
       // width: 70 * PdfPageFormat.mm,
       // height: 110 * PdfPageFormat.mm,
@@ -248,7 +256,7 @@ class ExamCardPdfService {
                 pw.Container(
                   decoration: pw.BoxDecoration(
                     border: pw.Border.all(),
-                    color: PdfColors.grey400,
+                    color: PdfColor.fromInt(major.colorValue),
                   ),
                   width: 12 * PdfPageFormat.mm,
                   height: double.infinity,

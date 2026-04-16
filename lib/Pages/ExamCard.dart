@@ -2,9 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
+import 'package:skavela_app/Models/MajorModel.dart';
 import 'package:skavela_app/Models/StudentModel.dart';
 import 'package:skavela_app/Repositories/ConfigRepository.dart';
 import '../Models/AppConfig.dart';
+import '../Repositories/MajorRepository.dart';
 import '../Repositories/StudentRepository.dart';
 import '../Services/ExamCardPdfService.dart';
 import '../Utils/AppLoading.dart';
@@ -27,6 +29,8 @@ class _ExamCardPageState extends State<ExamCardPage> {
     deskTitle: "Penilaian Sumatif Akhir Jenjang",
   );
 
+  List<Major> majors = [];
+
   @override
   void initState() {
     super.initState();
@@ -36,6 +40,7 @@ class _ExamCardPageState extends State<ExamCardPage> {
   void load() async {
     students = await StudentRepository.getAll();
     config = await ConfigRepository.get();
+    majors = await MajorRepository.getAll();
     setState(() {});
   }
 
@@ -74,7 +79,7 @@ class _ExamCardPageState extends State<ExamCardPage> {
               ),
               itemBuilder: (_, i) => Container(
                 margin: EdgeInsets.all(2.4),
-                child: ExamCardWidget(student: students[i], config: config),
+                child: ExamCardWidget(student: students[i], config: config, majors: majors,),
               ),
             ),
           ),

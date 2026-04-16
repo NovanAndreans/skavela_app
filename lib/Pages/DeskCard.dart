@@ -5,7 +5,9 @@ import 'package:skavela_app/Repositories/StudentRepository.dart';
 import 'package:skavela_app/Services/DeskCardPdfService.dart';
 import 'package:skavela_app/Utils/AppLoading.dart';
 
+import '../Models/MajorModel.dart';
 import '../Repositories/ConfigRepository.dart';
+import '../Repositories/MajorRepository.dart';
 import '../Widgets/DeskCardWidget.dart';
 
 class DeskCardPage extends StatefulWidget {
@@ -25,6 +27,8 @@ class _DeskCardPageState extends State<DeskCardPage> {
     deskTitle: "Penilaian Sumatif Akhir Jenjang",
   );
 
+  List<Major> majors = [];
+
   @override
   void initState() {
     super.initState();
@@ -34,6 +38,7 @@ class _DeskCardPageState extends State<DeskCardPage> {
   void load() async {
     students = await StudentRepository.getAll();
     config = await ConfigRepository.get();
+    majors = await MajorRepository.getAll();
     setState(() {});
   }
 
@@ -70,7 +75,11 @@ class _DeskCardPageState extends State<DeskCardPage> {
             childAspectRatio: 1.7,
           ),
           itemBuilder: (context, index) {
-            return DeskCardWidget(student: students[index], config: config);
+            return DeskCardWidget(
+              student: students[index],
+              config: config,
+              majors: majors,
+            );
           },
         ),
       ),

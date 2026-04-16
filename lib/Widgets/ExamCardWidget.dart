@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:skavela_app/Models/AppConfig.dart';
+import 'package:skavela_app/Models/MajorModel.dart';
 import 'package:skavela_app/Utils/AppSetting.dart';
 import '../Models/StudentModel.dart';
 import '../Utils/MajorColorHelper.dart';
@@ -9,11 +10,13 @@ import '../Utils/AppImages.dart';
 class ExamCardWidget extends StatelessWidget {
   final StudentModel student;
   final AppConfig config;
+  final List<Major> majors;
 
   const ExamCardWidget({
     super.key,
     required this.student,
     required this.config,
+    required this.majors,
   });
 
   @override
@@ -165,7 +168,7 @@ class ExamCardWidget extends StatelessWidget {
                 Container(
                   width: 24,
                   height: double.infinity,
-                  color: getMajorColor(student.jurusan),
+                  color: getMajorColor(majors, student.jurusan),
                   child: Center(
                     child: RotatedBox(
                       quarterTurns: 3,

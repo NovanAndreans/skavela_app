@@ -6,7 +6,9 @@ import 'package:skavela_app/Utils/AppImages.dart';
 import 'package:skavela_app/Models/AppConfig.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
+import '../Models/MajorModel.dart';
 import '../Repositories/ConfigRepository.dart';
+import '../Repositories/MajorRepository.dart';
 
 Future<pw.MemoryImage> loadImage(String path) async {
   final bytes = await rootBundle.load(path);
@@ -20,6 +22,9 @@ class DeskCardPdfService {
 
     AppConfig config;
     config = await ConfigRepository.get();
+
+    List<Major> majors;
+    majors = await MajorRepository.getAll();
 
     await Printing.layoutPdf(
       onLayout: (PdfPageFormat format) async {
@@ -49,15 +54,11 @@ class DeskCardPdfService {
           pw.MultiPage(
             pageFormat: pageFormat,
             build: (context) {
-              return List.generate(totalPages, (pageIndex) {
-                final start = pageIndex * cardsPerPage;
-                final end = (start + cardsPerPage).clamp(0, students.length);
-                final pageStudents = students.sublist(start, end);
-
-                return pw.Wrap(
+              return [
+                pw.Wrap(
                   spacing: spacing,
                   runSpacing: spacing,
-                  children: pageStudents.map((s) {
+                  children: students.map((s) {
                     return pw.Container(
                       width: cardWidth,
                       height: cardHeight,
@@ -65,11 +66,11 @@ class DeskCardPdfService {
                       decoration: pw.BoxDecoration(
                         border: pw.Border.all(width: 1),
                       ),
-                      child: _card(s, logo1, logo2, config),
+                      child: _card(s, logo1, logo2, config, majors),
                     );
                   }).toList(),
-                );
-              });
+                ),
+              ];
             },
           ),
         );
@@ -84,7 +85,9 @@ class DeskCardPdfService {
     pw.MemoryImage logo1,
     pw.MemoryImage logo2,
     AppConfig config,
+    List<Major> majors,
   ) {
+    final major = majors.firstWhere((m) => m.name == s.jurusan);
     return pw.SizedBox.expand(
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.stretch,
@@ -139,7 +142,12 @@ class DeskCardPdfService {
             children: [
               _box(s.ruang, flex: 2, bold: true),
               _box(s.kelas, flex: 3, bold: true),
-              _box(s.noUrut, flex: 2, color: PdfColors.red, bold: true),
+              _box(
+                s.noUrut,
+                flex: 2,
+                color: PdfColor.fromInt(major.colorValue),
+                bold: true,
+              ),
             ],
           ),
 
@@ -158,7 +166,10 @@ class DeskCardPdfService {
                 pw.TableRow(
                   children: [
                     _label("Konsli / Kelas"),
-                    _value(s.jurusan, background: PdfColors.orange200),
+                    _value(
+                      s.jurusan,
+                      background: PdfColor.fromInt(major.colorValue),
+                    ),
                   ],
                 ),
               ],

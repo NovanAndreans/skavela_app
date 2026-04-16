@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../Data/MajorData.dart';
+import '../Models/MajorModel.dart';
+import '../Repositories/MajorRepository.dart';
 
 class MajorSettingPage extends StatefulWidget {
   const MajorSettingPage({super.key});
@@ -9,131 +10,80 @@ class MajorSettingPage extends StatefulWidget {
 }
 
 class _MajorSettingPageState extends State<MajorSettingPage> {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Warna Jurusan",
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: ListView.builder(
-              itemCount: majors.length,
-              itemBuilder: (context, index) {
-                final major = majors[index];
 
-                return Card(
-                  child: ListTile(
-                    title: Text(major.name),
-                    trailing: GestureDetector(
-                      onTap: () async {
-                        final color = await showDialog<Color>(
-                          context: context,
-                          builder: (_) => _ColorPickerDialog(
-                            initialColor: major.color,
-                          ),
-                        );
-
-                        if (color != null) {
-                          setState(() {
-                            major.color = color;
-                          });
-                        }
-                      },
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: major.color,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          )
-        ],
-      ),
-    );
-  }
-}
-
-class _ColorPickerDialog extends StatefulWidget {
-  final Color initialColor;
-
-  const _ColorPickerDialog({required this.initialColor});
-
-  @override
-  State<_ColorPickerDialog> createState() => _ColorPickerDialogState();
-}
-
-class _ColorPickerDialogState extends State<_ColorPickerDialog> {
-  late Color selected;
+  List<Major> majors = [];
 
   @override
   void initState() {
-    selected = widget.initialColor;
     super.initState();
+    load();
   }
 
-  final colors = [
-    Colors.red,
-    Colors.blue,
-    Colors.green,
-    Colors.orange,
-    Colors.purple,
-    Colors.teal,
-    Colors.pink,
-    Colors.indigo,
-  ];
+  void load() async {
+    majors = await MajorRepository.getAll();
+    setState(() {});
+  }
+
+  void pickColor(Major m) async {
+    Color selected = m.color;
+
+    await showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: const Text("Pilih Warna"),
+          content: SingleChildScrollView(
+            child: Wrap(
+              spacing: 10,
+              children: Colors.primaries.map((c) {
+                return GestureDetector(
+                  onTap: () {
+                    selected = c;
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    color: c,
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        );
+      },
+    );
+
+    final updated = Major(
+      id: m.id,
+      code: m.code,
+      name: m.name,
+      colorValue: selected.value,
+    );
+
+    await MajorRepository.update(updated);
+    load();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text("Pilih Warna"),
-      content: Wrap(
-        spacing: 10,
-        runSpacing: 10,
-        children: colors
-            .map(
-              (c) => GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selected = c;
-                  });
-                },
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: c,
-                    borderRadius: BorderRadius.circular(8),
-                    border: selected == c
-                        ? Border.all(width: 3, color: Colors.black)
-                        : null,
-                  ),
-                ),
-              ),
-            )
-            .toList(),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text("Batal"),
-        ),
-        ElevatedButton(
-          onPressed: () => Navigator.pop(context, selected),
-          child: const Text("Simpan"),
-        ),
-      ],
+    return ListView.builder(
+      itemCount: majors.length,
+      itemBuilder: (context, i) {
+        final m = majors[i];
+
+        return ListTile(
+          title: Text("${m.code} - ${m.name}"),
+          trailing: GestureDetector(
+            onTap: () => pickColor(m),
+            child: Container(
+              width: 40,
+              height: 40,
+              color: m.color,
+            ),
+          ),
+        );
+      },
     );
   }
 }

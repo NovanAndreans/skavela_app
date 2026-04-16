@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:path_provider/path_provider.dart';
@@ -38,7 +39,56 @@ class AppDatabase {
           examLink TEXT,
           deskTitle TEXT
         );
+
+        CREATE TABLE majors(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          code TEXT,
+          name TEXT,
+          color INTEGER
+        );
         """);
+
+        await db.insert("majors", {
+          "code": "DPB",
+          "name": "Desain Produksi Busana",
+          "color": Colors.pink.value,
+        });
+
+        await db.insert("majors", {
+          "code": "KUL",
+          "name": "Kuliner",
+          "color": Colors.green.value,
+        });
+
+        await db.insert("majors", {
+          "code": "KA",
+          "name": "Kimia Analisis",
+          "color": Colors.blueGrey.value,
+        });
+
+        await db.insert("majors", {
+          "code": "APL",
+          "name": "Analisis Pengujian Laboratorium",
+          "color": Colors.blue.value,
+        });
+
+        await db.insert("majors", {
+          "code": "DKV",
+          "name": "Desain Komunikasi Visual",
+          "color": Colors.yellow.value,
+        });
+
+        await db.insert("majors", {
+          "code": "PSPT",
+          "name": "Produksi Siaran Program Televisi",
+          "color": Colors.orange.value,
+        });
+
+        await db.insert("majors", {
+          "code": "TKJ",
+          "name": "Teknik Komputer dan Jaringan",
+          "color": Colors.deepOrange.value,
+        });
       },
     );
 
