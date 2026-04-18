@@ -7,6 +7,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import '../Models/AppConfig.dart';
 import '../Models/MajorModel.dart';
 import '../Models/StudentModel.dart';
+import '../Repositories/ActivityRepository.dart';
 import '../Repositories/ConfigRepository.dart';
 import '../Repositories/MajorRepository.dart';
 
@@ -95,6 +96,11 @@ class ExamCardPdfService {
         ),
       );
     }
+
+    await ActivityRepository.log(
+      "EXPORT_EXAM_CARD",
+      "Generate kartu ujian (${students.length} siswa)",
+    );
 
     return pdf.save();
   }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../Models/StudentModel.dart';
 import '../PagesUtils/StudentTable.dart';
 import '../Forms/StudentForm.dart';
+import '../Repositories/ActivityRepository.dart';
 import '../Repositories/StudentRepository.dart';
 import '../Services/ExcelExportService.dart';
 import '../Services/ExcelImportService.dart';
@@ -37,8 +38,9 @@ class _StudentPageState extends State<StudentPage> {
     }
   }
 
-  void deleteStudent(String username) {
+  void deleteStudent(String username) async {
     StudentRepository.delete(username);
+    await ActivityRepository.log("STUDENT", "Hapus siswa ID: $username");
     refresh();
   }
 

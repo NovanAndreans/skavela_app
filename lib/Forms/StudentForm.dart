@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:skavela_app/Repositories/StudentRepository.dart';
 
 import '../Models/StudentModel.dart';
+import '../Repositories/ActivityRepository.dart';
 import '../Widgets/CustomInputs.dart';
 
 class StudentFormDialog extends StatefulWidget {
@@ -143,8 +144,16 @@ class _StudentFormDialogState extends State<StudentFormDialog> {
 
                             if (widget.student == null) {
                               await StudentRepository.insert(student);
+                              await ActivityRepository.log(
+                                "STUDENT",
+                                "Menambah siswa: ${student.name}",
+                              );
                             } else {
                               await StudentRepository.update(student);
+                              await ActivityRepository.log(
+                                "STUDENT",
+                                "Edit siswa: ${student.name}",
+                              );
                             }
 
                             Navigator.pop(context);

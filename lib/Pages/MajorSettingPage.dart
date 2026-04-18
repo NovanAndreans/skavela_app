@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../Models/MajorModel.dart';
+import '../Repositories/ActivityRepository.dart';
 import '../Repositories/MajorRepository.dart';
 
 class MajorSettingPage extends StatefulWidget {
@@ -38,8 +39,14 @@ class _MajorSettingPageState extends State<MajorSettingPage> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: code, decoration: const InputDecoration(labelText: "Kode")),
-              TextField(controller: name, decoration: const InputDecoration(labelText: "Nama")),
+              TextField(
+                controller: code,
+                decoration: const InputDecoration(labelText: "Kode"),
+              ),
+              TextField(
+                controller: name,
+                decoration: const InputDecoration(labelText: "Nama"),
+              ),
 
               const SizedBox(height: 10),
 
@@ -59,14 +66,10 @@ class _MajorSettingPageState extends State<MajorSettingPage> {
                         ),
                       );
                     },
-                    child: Container(
-                      width: 30,
-                      height: 30,
-                      color: c,
-                    ),
+                    child: Container(width: 30, height: 30, color: c),
                   );
                 }).toList(),
-              )
+              ),
             ],
           ),
           actions: [
@@ -85,8 +88,16 @@ class _MajorSettingPageState extends State<MajorSettingPage> {
 
                 if (major == null) {
                   await MajorRepository.insert(newMajor);
+                  await ActivityRepository.log(
+                    "MAJOR",
+                    "Tambah jurusan: ${newMajor.code}",
+                  );
                 } else {
                   await MajorRepository.update(newMajor);
+                  await ActivityRepository.log(
+                    "MAJOR",
+                    "Update jurusan: ${newMajor.code}",
+                  );
                 }
 
                 Navigator.pop(context);
@@ -135,10 +146,7 @@ class _MajorSettingPageState extends State<MajorSettingPage> {
       appBar: AppBar(
         title: const Text("Pengaturan Jurusan"),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () => openForm(),
-          )
+          IconButton(icon: const Icon(Icons.add), onPressed: () => openForm()),
         ],
       ),
       body: ListView.builder(
@@ -147,11 +155,7 @@ class _MajorSettingPageState extends State<MajorSettingPage> {
           final m = majors[i];
 
           return ListTile(
-            leading: Container(
-              width: 20,
-              height: 20,
-              color: m.color,
-            ),
+            leading: Container(width: 20, height: 20, color: m.color),
             title: Text("${m.code} - ${m.name}"),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,

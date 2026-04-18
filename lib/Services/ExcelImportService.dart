@@ -4,6 +4,7 @@ import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
 
 import '../Models/StudentModel.dart';
+import '../Repositories/ActivityRepository.dart';
 import '../Repositories/StudentRepository.dart';
 
 class ExcelImportService {
@@ -65,23 +66,26 @@ class ExcelImportService {
     for (int i = 1; i < sheet.rows.length; i++) {
       final row = sheet.rows[i];
       StudentModel newStudent = StudentModel(
-          name: row[1]?.value.toString() ?? '',
-          username: row[2]?.value.toString() ?? '',
-          password: row[3]?.value.toString() ?? '',
-          jurusan: row[4]?.value.toString() ?? '',
-          waktu1: row[5]?.value.toString() ?? '',
-          waktu2: row[6]?.value.toString() ?? '',
-          kelas: row[7]?.value.toString() ?? '',
-          noUrut: row[8]?.value.toString() ?? '',
-          ruang: row[9]?.value.toString() ?? '',
-        );
-
-      students.add(
-        newStudent,
+        name: row[1]?.value.toString() ?? '',
+        username: row[2]?.value.toString() ?? '',
+        password: row[3]?.value.toString() ?? '',
+        jurusan: row[4]?.value.toString() ?? '',
+        waktu1: row[5]?.value.toString() ?? '',
+        waktu2: row[6]?.value.toString() ?? '',
+        kelas: row[7]?.value.toString() ?? '',
+        noUrut: row[8]?.value.toString() ?? '',
+        ruang: row[9]?.value.toString() ?? '',
       );
+
+      students.add(newStudent);
 
       await StudentRepository.insert(newStudent); //Insert ke database
     }
+
+    await ActivityRepository.log(
+      "IMPORT_EXCEL",
+      "Import ${students.length} siswa dari Excel",
+    );
 
     return students;
   }

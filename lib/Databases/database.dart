@@ -45,6 +45,13 @@ class AppDatabase {
           name TEXT,
           color INTEGER
         );
+
+        CREATE TABLE activities(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          action TEXT,
+          description TEXT,
+          created_at TEXT
+        );
         """);
 
         await db.insert("majors", {

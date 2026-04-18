@@ -3,6 +3,8 @@ import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:skavela_app/Models/StudentModel.dart';
 
+import '../Repositories/ActivityRepository.dart';
+
 class ExcelExportService {
   static Future<void> exportStudents(List<StudentModel> students) async {
     final excel = Excel.createExcel();
@@ -72,7 +74,7 @@ class ExcelExportService {
               .value =
           s.ruang;
     }
-    
+
     final now = DateTime.now();
     final formattedDate =
         "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}_${now.hour.toString().padLeft(2, '0')}-${now.minute.toString().padLeft(2, '0')}";
@@ -85,6 +87,11 @@ class ExcelExportService {
     );
 
     if (outputFile == null) return;
+
+    await ActivityRepository.log(
+      "EXPORT_EXCEL",
+      "Export ${students.length} siswa ke Excel",
+    );
 
     final file = File(outputFile);
     await file.writeAsBytes(excel.encode()!);

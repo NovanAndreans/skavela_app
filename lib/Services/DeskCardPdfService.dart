@@ -7,6 +7,7 @@ import 'package:skavela_app/Models/AppConfig.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 import '../Models/MajorModel.dart';
+import '../Repositories/ActivityRepository.dart';
 import '../Repositories/ConfigRepository.dart';
 import '../Repositories/MajorRepository.dart';
 
@@ -25,6 +26,11 @@ class DeskCardPdfService {
 
     List<Major> majors;
     majors = await MajorRepository.getAll();
+
+    await ActivityRepository.log(
+      "EXPORT_DESK_CARD",
+      "Generate kartu meja (${students.length} siswa)",
+    );
 
     await Printing.layoutPdf(
       onLayout: (PdfPageFormat format) async {
