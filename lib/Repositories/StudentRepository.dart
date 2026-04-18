@@ -19,6 +19,33 @@ class StudentRepository {
     });
   }
 
+  static Future<StudentModel?> get(String username) async {
+    final db = await AppDatabase.instance();
+
+    final result = await db.query(
+      "students",
+      where: "username = ?",
+      whereArgs: [username],
+      limit: 1,
+    );
+
+    if (result.isEmpty) return null;
+
+    final data = result.first;
+
+    return StudentModel(
+      name: data["name"] as String,
+      username: data["username"] as String,
+      password: data["password"] as String,
+      jurusan: data["jurusan"] as String,
+      kelas: data["kelas"] as String,
+      noUrut: data["noUrut"] as String,
+      ruang: data["ruang"] as String,
+      waktu1: data["waktu1"] as String,
+      waktu2: data["waktu2"] as String,
+    );
+  }
+
   static Future<List<StudentModel>> getAll() async {
     final db = await AppDatabase.instance();
 

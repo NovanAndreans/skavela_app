@@ -22,10 +22,12 @@ class _StudentPageState extends State<StudentPage> {
   Set<String> selectedUsernames = {};
   bool isAllSelected = false;
 
-  void editStudent(int index) async {
+  void editStudent(String username) async {
+    final data = await StudentRepository.get(username);
+
     final result = await showDialog<StudentModel>(
       context: context,
-      builder: (_) => StudentFormDialog(student: students[index]),
+      builder: (_) => StudentFormDialog(student: data),
     );
 
     if (result != null) {

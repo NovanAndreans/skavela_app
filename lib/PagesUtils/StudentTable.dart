@@ -6,7 +6,7 @@ import '../Models/StudentModel.dart';
 class StudentTable extends StatefulWidget {
   final List<StudentModel> students;
   final Function(String index) onDelete;
-  final Function(int index) onEdit;
+  final Function(String username) onEdit;
   final Function(Set<String>, bool) onSelectionChanged;
 
   final Set<String> selectedUsernames;
@@ -293,7 +293,7 @@ class _StudentTableState extends State<StudentTable> {
                                 Icons.edit_outlined,
                                 size: 18),
                             onPressed: () {
-                              widget.onEdit(index);
+                              widget.onEdit(student.username);
                             },
                           ),
                           IconButton(
