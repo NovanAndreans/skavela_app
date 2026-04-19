@@ -45,7 +45,7 @@ class _ExamCardPageState extends State<ExamCardPage> {
   }
 
   void openFilterDialog() async {
-    final classController = TextEditingController();
+    // final classController = TextEditingController();
     final startController = TextEditingController();
     final endController = TextEditingController();
 
@@ -53,7 +53,7 @@ class _ExamCardPageState extends State<ExamCardPage> {
     String? selectedMajor;
 
     final classes = await StudentRepository.getClasses();
-    final majors = await MajorRepository.getCodes();
+    // final majors = await MajorRepository.getCodes();
 
     showDialog(
       context: context,

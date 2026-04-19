@@ -107,7 +107,7 @@ class _ActivityPageState extends State<ActivityPage> {
             child: Card(
               child: ListView.separated(
                 itemCount: activities.length,
-                separatorBuilder: (_, __) => const Divider(height: 1),
+                separatorBuilder: (_, _) => const Divider(height: 1),
                 itemBuilder: (context, i) {
                   final a = activities[i];
 
