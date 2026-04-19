@@ -12,7 +12,6 @@ class ActivityPage extends StatefulWidget {
 }
 
 class _ActivityPageState extends State<ActivityPage> {
-
   List<Activity> activities = [];
   String selectedFilter = "ALL";
 
@@ -74,7 +73,6 @@ class _ActivityPageState extends State<ActivityPage> {
       padding: const EdgeInsets.all(24),
       child: Column(
         children: [
-
           /// HEADER
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -84,19 +82,41 @@ class _ActivityPageState extends State<ActivityPage> {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
 
-              DropdownButton<String>(
-                value: selectedFilter,
-                items: filters.map((f) {
-                  return DropdownMenuItem(
-                    value: f,
-                    child: Text(f),
-                  );
-                }).toList(),
-                onChanged: (v) {
-                  selectedFilter = v!;
-                  load();
-                },
-              )
+              Row(
+                children: [
+                  DropdownButton<String>(
+                    value: selectedFilter,
+                    items: filters.map((f) {
+                      return DropdownMenuItem(value: f, child: Text(f));
+                    }).toList(),
+                    onChanged: (v) {
+                      selectedFilter = v!;
+                      load();
+                    },
+                  ),
+                  SizedBox(width: 16),
+                  PopupMenuButton<String>(
+                    onSelected: (value) async {
+                      if (value == "clear_all") {
+                        await ActivityRepository.deleteAll();
+                      } else if (value == "keep_50") {
+                        await ActivityRepository.keepLatest(50);
+                      }
+                      load();
+                    },
+                    itemBuilder: (_) => [
+                      const PopupMenuItem(
+                        value: "keep_50",
+                        child: Text("Simpan 50 terbaru"),
+                      ),
+                      const PopupMenuItem(
+                        value: "clear_all",
+                        child: Text("Hapus semua"),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ],
           ),
 
@@ -112,9 +132,7 @@ class _ActivityPageState extends State<ActivityPage> {
                   final a = activities[i];
 
                   return ListTile(
-                    leading: CircleAvatar(
-                      child: Icon(getIcon(a.action)),
-                    ),
+                    leading: CircleAvatar(child: Icon(getIcon(a.action))),
                     title: Text(a.description),
                     subtitle: Text(formatDate(a.createdAt)),
                     trailing: Text(

@@ -38,4 +38,25 @@ class ActivityRepository {
 
     return result.map((e) => Activity.fromMap(e)).toList();
   }
+
+  static Future<void> deleteAll() async {
+    final db = await AppDatabase.instance();
+    await db.delete("activities");
+  }
+
+  static Future<void> keepLatest(int limit) async {
+    final db = await AppDatabase.instance();
+
+    await db.rawDelete(
+      """
+    DELETE FROM activities
+    WHERE id NOT IN (
+      SELECT id FROM activities
+      ORDER BY created_at DESC
+      LIMIT ?
+    )
+  """,
+      [limit],
+    );
+  }
 }
