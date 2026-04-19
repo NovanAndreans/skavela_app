@@ -11,6 +11,14 @@ class MajorRepository {
     return result.map((e) => Major.fromMap(e)).toList();
   }
 
+  static Future<List<String>> getCodes() async {
+    final db = await AppDatabase.instance();
+
+    final result = await db.query("majors");
+
+    return result.map((e) => e["code"] as String).toList();
+  }
+
   static Future<void> update(Major m) async {
     final db = await AppDatabase.instance();
 

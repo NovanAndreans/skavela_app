@@ -44,25 +44,122 @@ class _ExamCardPageState extends State<ExamCardPage> {
     setState(() {});
   }
 
+  void openFilterDialog() async {
+    final classController = TextEditingController();
+    final startController = TextEditingController();
+    final endController = TextEditingController();
+
+    String? selectedClass;
+    String? selectedMajor;
+
+    final classes = await StudentRepository.getClasses();
+    final majors = await MajorRepository.getCodes();
+
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: const Text("Filter Data"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DropdownButtonFormField<String>(
+                hint: const Text("Pilih Kelas"),
+                value: selectedClass,
+                items: classes.map((c) {
+                  return DropdownMenuItem(value: c, child: Text(c));
+                }).toList(),
+                onChanged: (v) => selectedClass = v,
+              ),
+
+              // const SizedBox(height: 10),
+
+              // DropdownButtonFormField<String>(
+              //   hint: const Text("Pilih Jurusan"),
+              //   value: selectedMajor,
+              //   items: majors.map((m) {
+              //     return DropdownMenuItem(value: m, child: Text(m));
+              //   }).toList(),
+              //   onChanged: (v) => selectedMajor = v,
+              // ),
+
+              // const SizedBox(height: 10),
+
+              // TextField(
+              //   controller: startController,
+              //   keyboardType: TextInputType.number,
+              //   decoration: const InputDecoration(labelText: "No Urut Awal"),
+              // ),
+
+              // TextField(
+              //   controller: endController,
+              //   keyboardType: TextInputType.number,
+              //   decoration: const InputDecoration(labelText: "No Urut Akhir"),
+              // ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Batal"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final students = await StudentRepository.filter(
+                  className: selectedClass,
+                  majorCode: selectedMajor,
+                  startNumber: int.tryParse(startController.text),
+                  endNumber: int.tryParse(endController.text),
+                );
+
+                Navigator.pop(context);
+
+                final pdf = await ExamCardPdfService.generate(students);
+
+                try {
+                  AppLoading.show("Mengekspor Kartu Ujian...");
+
+                  await Printing.layoutPdf(onLayout: (format) => pdf);
+                } finally { 
+                  AppLoading.hide();
+                }
+              },
+              child: const Text("Generate"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Container(
           margin: EdgeInsets.all(3),
-          child: ElevatedButton(
-            onPressed: () async {
-              final pdf = await ExamCardPdfService.generate(students);
+          child: Row(
+            children: [
+              ElevatedButton(
+                onPressed: () async {
+                  final pdf = await ExamCardPdfService.generate(students);
 
-              try {
-                AppLoading.show("Mengekspor Kartu Ujian...");
+                  try {
+                    AppLoading.show("Mengekspor Kartu Ujian...");
 
-                await Printing.layoutPdf(onLayout: (format) => pdf);
-              } finally {
-                AppLoading.hide();
-              }
-            },
-            child: const Text("Export PDF"),
+                    await Printing.layoutPdf(onLayout: (format) => pdf);
+                  } finally {
+                    AppLoading.hide();
+                  }
+                },
+                child: const Text("Export Semua"),
+              ),
+              SizedBox(width: 20),
+              ElevatedButton(
+                onPressed: openFilterDialog,
+                child: const Text("Export per Kelas"),
+              ),
+            ],
           ),
         ),
         Center(
@@ -79,7 +176,11 @@ class _ExamCardPageState extends State<ExamCardPage> {
               ),
               itemBuilder: (_, i) => Container(
                 margin: EdgeInsets.all(2.4),
-                child: ExamCardWidget(student: students[i], config: config, majors: majors,),
+                child: ExamCardWidget(
+                  student: students[i],
+                  config: config,
+                  majors: majors,
+                ),
               ),
             ),
           ),

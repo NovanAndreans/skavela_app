@@ -42,6 +42,86 @@ class _DeskCardPageState extends State<DeskCardPage> {
     setState(() {});
   }
 
+  void openFilterDialog() async {
+    final classController = TextEditingController();
+    final startController = TextEditingController();
+    final endController = TextEditingController();
+
+    String? selectedClass;
+    String? selectedMajor;
+
+    final classes = await StudentRepository.getClasses();
+    final majors = await MajorRepository.getCodes();
+
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: const Text("Filter Data"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DropdownButtonFormField<String>(
+                hint: const Text("Pilih Kelas"),
+                value: selectedClass,
+                items: classes.map((c) {
+                  return DropdownMenuItem(value: c, child: Text(c));
+                }).toList(),
+                onChanged: (v) => selectedClass = v,
+              ),
+
+              // const SizedBox(height: 10),
+
+              // DropdownButtonFormField<String>(
+              //   hint: const Text("Pilih Jurusan"),
+              //   value: selectedMajor,
+              //   items: majors.map((m) {
+              //     return DropdownMenuItem(value: m, child: Text(m));
+              //   }).toList(),
+              //   onChanged: (v) => selectedMajor = v,
+              // ),
+
+              // const SizedBox(height: 10),
+
+              // TextField(
+              //   controller: startController,
+              //   keyboardType: TextInputType.number,
+              //   decoration: const InputDecoration(labelText: "No Urut Awal"),
+              // ),
+
+              // TextField(
+              //   controller: endController,
+              //   keyboardType: TextInputType.number,
+              //   decoration: const InputDecoration(labelText: "No Urut Akhir"),
+              // ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Batal"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final students = await StudentRepository.filter(
+                  className: selectedClass,
+                  majorCode: selectedMajor,
+                  startNumber: int.tryParse(startController.text),
+                  endNumber: int.tryParse(endController.text),
+                );
+
+                Navigator.pop(context);
+
+                await DeskCardPdfService.generate(students);
+              },
+              child: const Text("Generate"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,7 +139,12 @@ class _DeskCardPageState extends State<DeskCardPage> {
               }
             },
             icon: const Icon(Icons.picture_as_pdf),
-            label: const Text("Export PDF"),
+            label: const Text("Export Semua"),
+          ),
+          const SizedBox(width: 16),
+          ElevatedButton(
+            onPressed: openFilterDialog,
+            child: const Text("Export per Kelas"),
           ),
           const SizedBox(width: 16),
         ],

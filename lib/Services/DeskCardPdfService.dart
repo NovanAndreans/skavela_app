@@ -151,7 +151,7 @@ class DeskCardPdfService {
               _box(
                 s.noUrut,
                 flex: 2,
-                color: PdfColor.fromInt(major.colorValue),
+                color: PdfColors.red,
                 bold: true,
               ),
             ],
