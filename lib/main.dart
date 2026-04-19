@@ -24,10 +24,7 @@ class SchoolAdminApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'School Admin',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorSchemeSeed: Colors.indigo,
-      ),
+      theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.indigo),
       home: const LoadingOverlay(child: MainLayout()),
     );
   }
@@ -43,16 +40,28 @@ class MainLayout extends StatefulWidget {
 class _MainLayoutState extends State<MainLayout> {
   int selectedIndex = 0;
   bool isExpanded = false;
+  late final List<Widget> pages;
 
-  final pages = const [
-    DashboardPage(),
-    StudentPage(),
-    MajorSettingPage(),
-    ConfigPage(),
-    ExamCardPage(),
-    DeskCardPage(),
-    ActivityPage(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+
+    pages = [
+      DashboardPage(onNavigate: navigate),
+      StudentPage(),
+      MajorSettingPage(),
+      ConfigPage(),
+      ExamCardPage(),
+      DeskCardPage(),
+      ActivityPage(),
+    ];
+  }
+
+  void navigate(int index) {
+    setState(() {
+      selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -168,10 +177,7 @@ class _MainLayoutState extends State<MainLayout> {
                 ? MainAxisAlignment.start
                 : MainAxisAlignment.center,
             children: [
-              Icon(
-                icon,
-                color: Colors.white,
-              ),
+              Icon(icon, color: Colors.white),
               if (isExpanded) ...[
                 const SizedBox(width: 10),
                 Expanded(
@@ -180,7 +186,7 @@ class _MainLayoutState extends State<MainLayout> {
                     style: const TextStyle(color: Colors.white),
                   ),
                 ),
-              ]
+              ],
             ],
           ),
         ),

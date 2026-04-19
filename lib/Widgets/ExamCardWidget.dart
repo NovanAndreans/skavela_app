@@ -40,8 +40,8 @@ class ExamCardWidget extends StatelessWidget {
                     margin: EdgeInsets.all(3),
                     child: Image.asset(
                       appImages.logoMalang,
-                      width: 35,
-                      height: 45,
+                      width: 45,
+                      height: 55,
                     ),
                   ),
                   Column(
@@ -50,19 +50,19 @@ class ExamCardWidget extends StatelessWidget {
                         config.examTitle,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 9,
+                          fontSize: 12,
                         ),
                       ),
-                      Text(config.schoolName, style: TextStyle(fontSize: 8)),
-                      Text(config.year, style: TextStyle(fontSize: 8)),
+                      Text(config.schoolName, style: TextStyle(fontSize: 11)),
+                      Text(config.year, style: TextStyle(fontSize: 11)),
                     ],
                   ),
                   Container(
                     margin: EdgeInsets.all(3),
                     child: Image.asset(
                       appImages.logoSMK,
-                      width: 38,
-                      height: 41,
+                      width: 48,
+                      height: 51,
                     ),
                   ),
                 ],
@@ -74,7 +74,7 @@ class ExamCardWidget extends StatelessWidget {
                 padding: const EdgeInsets.all(3),
                 child: Text(
                   config.examLink,
-                  style: const TextStyle(fontSize: 8),
+                  style: const TextStyle(fontSize: 11),
                 ),
               ),
 
@@ -95,8 +95,8 @@ class ExamCardWidget extends StatelessWidget {
                         margin: EdgeInsets.all(3),
                         child: Image.asset(
                           appImages.logoWM,
-                          width: 48,
-                          height: 51,
+                          width: 58,
+                          height: 61,
                         ),
                       ),
                       Column(
@@ -112,24 +112,24 @@ class ExamCardWidget extends StatelessWidget {
                               children: [
                                 Text(
                                   "Ruang : ${student.ruang}",
-                                  style: const TextStyle(fontSize: 9),
+                                  style: const TextStyle(fontSize: 12),
                                 ),
                                 Column(
                                   children: [
                                     Text(
                                       student.waktu1,
-                                      style: const TextStyle(fontSize: 8),
+                                      style: const TextStyle(fontSize: 11),
                                     ),
                                     Text(
                                       student.waktu2,
-                                      style: const TextStyle(fontSize: 8),
+                                      style: const TextStyle(fontSize: 11),
                                     ),
                                   ],
                                 ),
                                 Text(
                                   student.noUrut,
                                   style: const TextStyle(
-                                    fontSize: 8,
+                                    fontSize: 11,
                                     color: Colors.red,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -145,7 +145,7 @@ class ExamCardWidget extends StatelessWidget {
                             child: Table(
                               // border: TableBorder.all(color: Colors.black),
                               columnWidths: const {
-                                0: FixedColumnWidth(90),
+                                0: FixedColumnWidth(120),
                                 1: FixedColumnWidth(8),
                                 2: FlexColumnWidth(),
                               },
@@ -195,15 +195,15 @@ class ExamCardWidget extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.all(3.9),
-          child: Text(label, style: const TextStyle(fontSize: 8)),
+          child: Text(label, style: const TextStyle(fontSize: 11)),
         ),
         const Padding(
           padding: EdgeInsets.all(3.9),
-          child: Text(":", style: TextStyle(fontSize: 8)),
+          child: Text(":", style: TextStyle(fontSize: 11)),
         ),
         Padding(
           padding: const EdgeInsets.all(3.9),
-          child: Text(value, style: const TextStyle(fontSize: 8)),
+          child: Text(value, style: const TextStyle(fontSize: 11)),
         ),
       ],
     );

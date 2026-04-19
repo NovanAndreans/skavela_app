@@ -1,11 +1,11 @@
-// ignore_for_file: file_names
-
 import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
 import 'package:skavela_app/Models/MajorModel.dart';
 import 'package:skavela_app/Models/StudentModel.dart';
 import 'package:skavela_app/Repositories/ConfigRepository.dart';
+
 import '../Models/AppConfig.dart';
+import '../Repositories/ActivityRepository.dart';
 import '../Repositories/MajorRepository.dart';
 import '../Repositories/StudentRepository.dart';
 import '../Services/ExamCardPdfService.dart';
@@ -21,6 +21,8 @@ class ExamCardPage extends StatefulWidget {
 
 class _ExamCardPageState extends State<ExamCardPage> {
   List<StudentModel> students = [];
+  List<Major> majors = [];
+
   AppConfig config = AppConfig(
     examTitle: "Kartu Peserta PSAJ",
     schoolName: "SMKN 7 MALANG",
@@ -28,8 +30,6 @@ class _ExamCardPageState extends State<ExamCardPage> {
     examLink: "cbt.smkn7malang.sch.id",
     deskTitle: "Penilaian Sumatif Akhir Jenjang",
   );
-
-  List<Major> majors = [];
 
   @override
   void initState() {
@@ -44,59 +44,35 @@ class _ExamCardPageState extends State<ExamCardPage> {
     setState(() {});
   }
 
+  /// ================= EXPORT ALL =================
+  void exportAll() async {
+    final pdf = await ExamCardPdfService.generate(students);
+
+    try {
+      AppLoading.show("Mengekspor Kartu Ujian...");
+      await Printing.layoutPdf(onLayout: (format) => pdf);
+    } finally {
+      AppLoading.hide();
+    }
+  }
+
+  /// ================= FILTER =================
   void openFilterDialog() async {
-    // final classController = TextEditingController();
-    final startController = TextEditingController();
-    final endController = TextEditingController();
-
     String? selectedClass;
-    String? selectedMajor;
-
     final classes = await StudentRepository.getClasses();
-    // final majors = await MajorRepository.getCodes();
 
     showDialog(
       context: context,
       builder: (_) {
         return AlertDialog(
-          title: const Text("Filter Data"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DropdownButtonFormField<String>(
-                hint: const Text("Pilih Kelas"),
-                value: selectedClass,
-                items: classes.map((c) {
-                  return DropdownMenuItem(value: c, child: Text(c));
-                }).toList(),
-                onChanged: (v) => selectedClass = v,
-              ),
-
-              // const SizedBox(height: 10),
-
-              // DropdownButtonFormField<String>(
-              //   hint: const Text("Pilih Jurusan"),
-              //   value: selectedMajor,
-              //   items: majors.map((m) {
-              //     return DropdownMenuItem(value: m, child: Text(m));
-              //   }).toList(),
-              //   onChanged: (v) => selectedMajor = v,
-              // ),
-
-              // const SizedBox(height: 10),
-
-              // TextField(
-              //   controller: startController,
-              //   keyboardType: TextInputType.number,
-              //   decoration: const InputDecoration(labelText: "No Urut Awal"),
-              // ),
-
-              // TextField(
-              //   controller: endController,
-              //   keyboardType: TextInputType.number,
-              //   decoration: const InputDecoration(labelText: "No Urut Akhir"),
-              // ),
-            ],
+          title: const Text("Cetak per Kelas"),
+          content: DropdownButtonFormField<String>(
+            hint: const Text("Pilih Kelas"),
+            value: selectedClass,
+            items: classes.map((c) {
+              return DropdownMenuItem(value: c, child: Text(c));
+            }).toList(),
+            onChanged: (v) => selectedClass = v,
           ),
           actions: [
             TextButton(
@@ -105,22 +81,23 @@ class _ExamCardPageState extends State<ExamCardPage> {
             ),
             ElevatedButton(
               onPressed: () async {
-                final students = await StudentRepository.filter(
+                final filtered = await StudentRepository.filter(
                   className: selectedClass,
-                  majorCode: selectedMajor,
-                  startNumber: int.tryParse(startController.text),
-                  endNumber: int.tryParse(endController.text),
                 );
 
                 Navigator.pop(context);
 
-                final pdf = await ExamCardPdfService.generate(students);
+                final pdf = await ExamCardPdfService.generate(filtered);
+
+                await ActivityRepository.log(
+                  "EXPORT_EXAM_CARD",
+                  "Generate kartu ujian kelas $selectedClass",
+                );
 
                 try {
-                  AppLoading.show("Mengekspor Kartu Ujian...");
-
+                  AppLoading.show("Mengekspor...");
                   await Printing.layoutPdf(onLayout: (format) => pdf);
-                } finally { 
+                } finally {
                   AppLoading.hide();
                 }
               },
@@ -132,60 +109,93 @@ class _ExamCardPageState extends State<ExamCardPage> {
     );
   }
 
+  /// ================= RESPONSIVE GRID =================
+  int getCrossAxisCount(double width) {
+    if (width > 1400) return 4;
+    if (width > 1000) return 3;
+    if (width > 700) return 2;
+    return 1;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          margin: EdgeInsets.all(3),
-          child: Row(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final crossAxisCount = getCrossAxisCount(constraints.maxWidth);
+
+        return Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
             children: [
-              ElevatedButton(
-                onPressed: () async {
-                  final pdf = await ExamCardPdfService.generate(students);
+              /// ================= HEADER =================
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Cetak Kartu Ujian",
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineMedium
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
 
-                  try {
-                    AppLoading.show("Mengekspor Kartu Ujian...");
-
-                    await Printing.layoutPdf(onLayout: (format) => pdf);
-                  } finally {
-                    AppLoading.hide();
-                  }
-                },
-                child: const Text("Export Semua"),
+                  /// BUTTON RIGHT
+                  Row(
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: openFilterDialog,
+                        icon: const Icon(Icons.filter_alt),
+                        label: const Text("Cetak per Kelas"),
+                      ),
+                      const SizedBox(width: 12),
+                      ElevatedButton.icon(
+                        onPressed: exportAll,
+                        icon: const Icon(Icons.print),
+                        label: const Text("Cetak"),
+                      ),
+                    ],
+                  )
+                ],
               ),
-              SizedBox(width: 20),
-              ElevatedButton(
-                onPressed: openFilterDialog,
-                child: const Text("Export per Kelas"),
+
+              const SizedBox(height: 20),
+
+              /// ================= GRID =================
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: GridView.builder(
+                    itemCount: students.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: crossAxisCount,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      childAspectRatio: 260 / 170,
+                    ),
+                    itemBuilder: (_, i) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: Colors.white,
+                        ),
+                        child: ExamCardWidget(
+                          student: students[i],
+                          config: config,
+                          majors: majors,
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
             ],
           ),
-        ),
-        Center(
-          child: Container(
-            margin: EdgeInsets.all(3),
-            width: 820,
-            height: 700,
-            color: Colors.grey.shade200,
-            child: GridView.builder(
-              itemCount: students.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                childAspectRatio: 260 / 170,
-              ),
-              itemBuilder: (_, i) => Container(
-                margin: EdgeInsets.all(2.4),
-                child: ExamCardWidget(
-                  student: students[i],
-                  config: config,
-                  majors: majors,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 }

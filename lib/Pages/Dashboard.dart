@@ -1,8 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import '../Models/ActivityModel.dart';
+import '../Repositories/ActivityRepository.dart';
+import '../Repositories/MajorRepository.dart';
+import '../Repositories/StudentRepository.dart';
 import '../Widgets/StatCard.dart';
 
-class DashboardPage extends StatelessWidget {
-  const DashboardPage({super.key});
+class DashboardPage extends StatefulWidget {
+  final Function(int) onNavigate;
+
+  const DashboardPage({super.key, required this.onNavigate});
+
+  @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+  int totalStudents = 0;
+  int totalClasses = 0;
+  int totalMajors = 0;
+
+  List<Activity> activities = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadData();
+  }
+
+  void loadData() async {
+    final students = await StudentRepository.getAll();
+    final classes = await StudentRepository.getClasses();
+    final majors = await MajorRepository.getAll();
+    final recent = await ActivityRepository.getRecent();
+
+    setState(() {
+      totalStudents = students.length;
+      totalClasses = classes.length;
+      totalMajors = majors.length;
+      activities = recent.take(5).toList(); // ambil 5 terbaru
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,19 +64,19 @@ class DashboardPage extends StatelessWidget {
                         children: [
                           Text(
                             'Dashboard',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineMedium
+                            style: Theme.of(context).textTheme.headlineMedium
                                 ?.copyWith(fontWeight: FontWeight.bold),
                           ),
                           Row(
                             children: const [
                               CircleAvatar(
-                                  radius: 6, backgroundColor: Colors.red),
+                                radius: 6,
+                                backgroundColor: Colors.red,
+                              ),
                               SizedBox(width: 8),
                               Text('Offline'),
                             ],
-                          )
+                          ),
                         ],
                       ),
 
@@ -77,7 +115,7 @@ class DashboardPage extends StatelessWidget {
                               Text(
                                 'Cetak kartu ujian dengan mudah dan cepat',
                                 style: TextStyle(color: Colors.white70),
-                              )
+                              ),
                             ],
                           ),
                         ),
@@ -89,7 +127,9 @@ class DashboardPage extends StatelessWidget {
                       const Text(
                         'Cetak',
                         style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
 
                       const SizedBox(height: 12),
@@ -101,6 +141,7 @@ class DashboardPage extends StatelessWidget {
                               icon: Icons.credit_card,
                               label: 'Kartu Ujian',
                               color: Colors.deepPurple,
+                              onTap: () => widget.onNavigate(4),
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -109,6 +150,7 @@ class DashboardPage extends StatelessWidget {
                               icon: Icons.table_restaurant,
                               label: 'Kartu Meja',
                               color: Colors.teal,
+                              onTap: () => widget.onNavigate(5),
                             ),
                           ),
                         ],
@@ -120,18 +162,25 @@ class DashboardPage extends StatelessWidget {
                       SizedBox(
                         height: 120, // <-- penting!
                         child: Row(
-                          children: const [
+                          children: [
                             Expanded(
-                                child: StatCard(
-                                    title: 'Total Siswa', value: '1.945')),
-                            SizedBox(width: 16),
+                              child: StatCard(
+                                title: 'Total Siswa',
+                                value: totalStudents.toString(),
+                              ),
+                            ),
                             Expanded(
-                                child: StatCard(
-                                    title: 'Total Kelas', value: '50')),
-                            SizedBox(width: 16),
+                              child: StatCard(
+                                title: 'Total Kelas',
+                                value: totalClasses.toString(),
+                              ),
+                            ),
                             Expanded(
-                                child: StatCard(
-                                    title: 'Total Jurusan', value: '7')),
+                              child: StatCard(
+                                title: 'Total Jurusan',
+                                value: totalMajors.toString(),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -161,27 +210,36 @@ class DashboardPage extends StatelessWidget {
 
                         /// WAJIB Expanded biar tidak error
                         Expanded(
-                          child: ListView(
-                            children: const [
-                              ActivityItem(color: Colors.deepPurple),
-                              ActivityItem(color: Colors.teal),
-                              ActivityItem(color: Colors.red),
-                              ActivityItem(color: Colors.blue),
-                            ],
+                          child: Expanded(
+                            child: ListView.builder(
+                              itemCount: activities.length,
+                              itemBuilder: (context, i) {
+                                final a = activities[i];
+
+                                return ActivityItem(
+                                  action: a.action,
+                                  description: a.description,
+                                  time: formatTime(a.createdAt),
+                                );
+                              },
+                            ),
                           ),
                         ),
 
-                        const Align(
+                        Align(
                           alignment: Alignment.centerRight,
-                          child: Text(
-                            'Lihat Semua',
-                            style: TextStyle(color: Colors.blue),
+                          child: GestureDetector(
+                            onTap: () => widget.onNavigate(6),
+                            child: const Text(
+                              'Lihat Semua',
+                              style: TextStyle(color: Colors.blue),
+                            ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -195,27 +253,31 @@ class DashboardPage extends StatelessWidget {
     required IconData icon,
     required String label,
     required Color color,
+    required VoidCallback onTap,
   }) {
-    return Container(
-      height: 80,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        gradient: LinearGradient(
-          colors: [color.withOpacity(0.8), color],
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 80,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: LinearGradient(colors: [color.withOpacity(0.8), color]),
         ),
-      ),
-      child: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: Colors.white),
-            const SizedBox(width: 10),
-            Text(
-              label,
-              style: const TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.bold),
-            )
-          ],
+        child: Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: Colors.white),
+              const SizedBox(width: 10),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -224,12 +286,50 @@ class DashboardPage extends StatelessWidget {
 
 /// ACTIVITY ITEM
 class ActivityItem extends StatelessWidget {
-  final Color color;
+  final String action;
+  final String description;
+  final String time;
 
   const ActivityItem({
     super.key,
-    required this.color,
+    required this.action,
+    required this.description,
+    required this.time,
   });
+
+  IconData getIcon() {
+    switch (action) {
+      case "IMPORT_EXCEL":
+        return Icons.upload_file;
+      case "EXPORT_EXCEL":
+        return Icons.download;
+      case "EXPORT_EXAM_CARD":
+        return Icons.picture_as_pdf;
+      case "EXPORT_DESK_CARD":
+        return Icons.table_restaurant;
+      case "CREATE_STUDENT":
+        return Icons.person_add;
+      case "DELETE_STUDENT":
+        return Icons.delete;
+      default:
+        return Icons.history;
+    }
+  }
+
+  Color getColor() {
+    switch (action) {
+      case "IMPORT_EXCEL":
+        return Colors.blue;
+      case "EXPORT_EXAM_CARD":
+        return Colors.deepPurple;
+      case "EXPORT_DESK_CARD":
+        return Colors.teal;
+      case "DELETE_STUDENT":
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -243,19 +343,21 @@ class ActivityItem extends StatelessWidget {
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: color,
-            child: const Icon(Icons.print, color: Colors.white, size: 16),
+            backgroundColor: getColor(),
+            child: Icon(getIcon(), color: Colors.white, size: 16),
           ),
           const SizedBox(width: 10),
-          const Expanded(
-            child: Text(
-              'Cetak kartu ujian\nLorem ipsum dolor',
-              style: TextStyle(fontSize: 12),
-            ),
+          Expanded(
+            child: Text(description, style: const TextStyle(fontSize: 12)),
           ),
-          const Text('11:30', style: TextStyle(fontSize: 10))
+          Text(time, style: const TextStyle(fontSize: 10)),
         ],
       ),
     );
   }
+}
+
+String formatTime(String iso) {
+  final dt = DateTime.parse(iso);
+  return DateFormat("HH:mm").format(dt);
 }

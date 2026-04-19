@@ -24,95 +24,261 @@ class _MajorSettingPageState extends State<MajorSettingPage> {
     setState(() {});
   }
 
-  // ================= ADD / EDIT =================
-
+  /// ================= FORM =================
   void openForm({Major? major}) {
     final code = TextEditingController(text: major?.code);
     final name = TextEditingController(text: major?.name);
+
     Color selected = major?.color ?? Colors.blue;
+
+    double hue = HSVColor.fromColor(selected).hue;
+    double saturation = HSVColor.fromColor(selected).saturation;
+    double value = HSVColor.fromColor(selected).value;
+
+    final hexController = TextEditingController(
+      text: selected.value.toRadixString(16).substring(2).toUpperCase(),
+    );
+
+    final List<Color> palette = [
+      Colors.red,
+      Colors.pink,
+      Colors.purple,
+      Colors.deepPurple,
+      Colors.indigo,
+      Colors.blue,
+      Colors.lightBlue,
+      Colors.cyan,
+      Colors.teal,
+      Colors.green,
+      Colors.lightGreen,
+      Colors.lime,
+      Colors.yellow,
+      Colors.amber,
+      Colors.orange,
+      Colors.deepOrange,
+      Colors.brown,
+      Colors.blueGrey,
+    ];
 
     showDialog(
       context: context,
       builder: (_) {
-        return AlertDialog(
-          title: Text(major == null ? "Tambah Jurusan" : "Edit Jurusan"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: code,
-                decoration: const InputDecoration(labelText: "Kode"),
-              ),
-              TextField(
-                controller: name,
-                decoration: const InputDecoration(labelText: "Nama"),
-              ),
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            /// HSV → COLOR
+            Color getColor() {
+              return HSVColor.fromAHSV(1, hue, saturation, value).toColor();
+            }
 
-              const SizedBox(height: 10),
-
-              Wrap(
-                spacing: 8,
-                children: Colors.primaries.map((c) {
-                  return GestureDetector(
-                    onTap: () {
-                      selected = c;
-                      Navigator.pop(context);
-                      openForm(
-                        major: Major(
-                          id: major?.id,
-                          code: code.text,
-                          name: name.text,
-                          colorValue: c.value,
-                        ),
-                      );
-                    },
-                    child: Container(width: 30, height: 30, color: c),
-                  );
-                }).toList(),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Batal"),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                final newMajor = Major(
-                  id: major?.id,
-                  code: code.text,
-                  name: name.text,
-                  colorValue: selected.value,
-                );
-
-                if (major == null) {
-                  await MajorRepository.insert(newMajor);
-                  await ActivityRepository.log(
-                    "MAJOR",
-                    "Tambah jurusan: ${newMajor.code}",
-                  );
-                } else {
-                  await MajorRepository.update(newMajor);
-                  await ActivityRepository.log(
-                    "MAJOR",
-                    "Update jurusan: ${newMajor.code}",
-                  );
+            /// HEX → COLOR
+            Color? hexToColor(String hex) {
+              try {
+                hex = hex.replaceAll("#", "");
+                if (hex.length == 6) {
+                  return Color(int.parse("FF$hex", radix: 16));
                 }
+              } catch (_) {}
+              return null;
+            }
 
-                Navigator.pop(context);
-                load();
-              },
-              child: const Text("Simpan"),
-            ),
-          ],
+            /// update HEX dari color
+            void updateHex(Color c) {
+              hexController.text = c.value
+                  .toRadixString(16)
+                  .substring(2)
+                  .toUpperCase();
+            }
+
+            selected = getColor();
+            updateHex(selected);
+
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: Text(major == null ? "Tambah Jurusan" : "Edit Jurusan"),
+              content: SizedBox(
+                width: 420,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    /// INPUT
+                    TextField(
+                      controller: code,
+                      decoration: const InputDecoration(labelText: "Kode"),
+                    ),
+                    TextField(
+                      controller: name,
+                      decoration: const InputDecoration(labelText: "Nama"),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    /// PREVIEW
+                    Container(
+                      height: 40,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: selected,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    /// HEX INPUT
+                    TextField(
+                      controller: hexController,
+                      decoration: const InputDecoration(
+                        labelText: "HEX Color",
+                        prefixText: "#",
+                      ),
+                      onChanged: (val) {
+                        final c = hexToColor(val);
+                        if (c != null) {
+                          final hsv = HSVColor.fromColor(c);
+                          setStateDialog(() {
+                            hue = hsv.hue;
+                            saturation = hsv.saturation;
+                            value = hsv.value;
+                          });
+                        }
+                      },
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    /// PALETTE
+                    SizedBox(
+                      height: 80,
+                      child: GridView.builder(
+                        itemCount: palette.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 9,
+                              crossAxisSpacing: 6,
+                              mainAxisSpacing: 6,
+                            ),
+                        itemBuilder: (_, i) {
+                          final c = palette[i];
+
+                          return GestureDetector(
+                            onTap: () {
+                              final hsv = HSVColor.fromColor(c);
+                              setStateDialog(() {
+                                hue = hsv.hue;
+                                saturation = hsv.saturation;
+                                value = hsv.value;
+                              });
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: c,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    /// HUE
+                    Row(
+                      children: [
+                        const Text("Hue"),
+                        Expanded(
+                          child: Slider(
+                            value: hue,
+                            min: 0,
+                            max: 360,
+                            onChanged: (v) {
+                              setStateDialog(() => hue = v);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    /// SAT
+                    Row(
+                      children: [
+                        const Text("Sat"),
+                        Expanded(
+                          child: Slider(
+                            value: saturation,
+                            min: 0,
+                            max: 1,
+                            onChanged: (v) {
+                              setStateDialog(() => saturation = v);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    /// VAL
+                    Row(
+                      children: [
+                        const Text("Val"),
+                        Expanded(
+                          child: Slider(
+                            value: value,
+                            min: 0,
+                            max: 1,
+                            onChanged: (v) {
+                              setStateDialog(() => value = v);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Batal"),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    final newMajor = Major(
+                      id: major?.id,
+                      code: code.text,
+                      name: name.text,
+                      colorValue: selected.value,
+                    );
+
+                    if (major == null) {
+                      await MajorRepository.insert(newMajor);
+                      await ActivityRepository.log(
+                        "MAJOR",
+                        "Tambah ${newMajor.code}",
+                      );
+                    } else {
+                      await MajorRepository.update(newMajor);
+                      await ActivityRepository.log(
+                        "MAJOR",
+                        "Update ${newMajor.code}",
+                      );
+                    }
+
+                    Navigator.pop(context);
+                    load();
+                  },
+                  child: const Text("Simpan"),
+                ),
+              ],
+            );
+          },
         );
       },
     );
   }
 
-  // ================= DELETE =================
-
+  /// ================= DELETE =================
   void delete(Major m) async {
     final confirm = await showDialog(
       context: context,
@@ -138,40 +304,93 @@ class _MajorSettingPageState extends State<MajorSettingPage> {
     }
   }
 
-  // ================= UI =================
-
+  /// ================= UI =================
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Pengaturan Jurusan"),
-        actions: [
-          IconButton(icon: const Icon(Icons.add), onPressed: () => openForm()),
-        ],
-      ),
-      body: ListView.builder(
-        itemCount: majors.length,
-        itemBuilder: (context, i) {
-          final m = majors[i];
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        children: [
+          /// HEADER
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Pengaturan Jurusan",
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              ElevatedButton.icon(
+                onPressed: () => openForm(),
+                icon: const Icon(Icons.add),
+                label: const Text("Tambah Jurusan"),
+              ),
+            ],
+          ),
 
-          return ListTile(
-            leading: Container(width: 20, height: 20, color: m.color),
-            title: Text("${m.code} - ${m.name}"),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.edit),
-                  onPressed: () => openForm(major: m),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () => delete(m),
-                ),
-              ],
+          const SizedBox(height: 20),
+
+          /// LIST
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: majors.isEmpty
+                  ? const Center(child: Text("Belum ada data"))
+                  : ListView.separated(
+                      itemCount: majors.length,
+                      separatorBuilder: (_, _) => const SizedBox(height: 10),
+                      itemBuilder: (context, i) {
+                        final m = majors[i];
+
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 20,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  color: m.color,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Text(
+                                  "${m.code} - ${m.name}",
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () => openForm(major: m),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () => delete(m),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }

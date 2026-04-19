@@ -50,7 +50,7 @@ class _ConfigPageState extends State<ConfigPage> {
     await ConfigRepository.save(config);
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Config disimpan")),
+      const SnackBar(content: Text("Config berhasil disimpan")),
     );
   }
 
@@ -58,28 +58,96 @@ class _ConfigPageState extends State<ConfigPage> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(24),
-      child: Form(
-        key: _formKey,
-        child: ListView(
-          children: [
-            _field("Judul Kartu Ujian", examTitle),
-            _field("Nama Sekolah", schoolName),
-            _field("Tahun Ajaran", year),
-            _field("Tautan Ujian", link),
-            _field("Judul Kartu Meja", deskTitle),
+      child: Column(
+        children: [
+          /// ================= HEADER =================
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Pengaturan Aplikasi",
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
 
-            const SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-            ElevatedButton(
-              onPressed: save,
-              child: const Text("Simpan"),
-            )
-          ],
+          /// ================= FORM =================
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Form(
+                key: _formKey,
+                child: ListView(
+                  children: [
+                    /// ===== SECTION: UJIAN =====
+                    _sectionTitle("Pengaturan Ujian"),
+                    _field("Judul Kartu Ujian", examTitle),
+                    _field("Tautan Ujian", link),
+
+                    const SizedBox(height: 20),
+
+                    /// ===== SECTION: SEKOLAH =====
+                    _sectionTitle("Informasi Sekolah"),
+                    _field("Nama Sekolah", schoolName),
+                    _field("Tahun Ajaran", year),
+
+                    const SizedBox(height: 20),
+
+                    /// ===== SECTION: MEJA =====
+                    _sectionTitle("Kartu Meja"),
+                    _field("Judul Kartu Meja", deskTitle),
+
+                    const SizedBox(height: 30),
+
+                    /// BUTTON
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: save,
+                          icon: const Icon(Icons.save),
+                          label: const Text("Simpan"),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 14),
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// ================= SECTION TITLE =================
+  Widget _sectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );
   }
 
+  /// ================= INPUT FIELD =================
   Widget _field(String label, TextEditingController c) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -87,7 +155,13 @@ class _ConfigPageState extends State<ConfigPage> {
         controller: c,
         decoration: InputDecoration(
           labelText: label,
-          border: const OutlineInputBorder(),
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
         validator: (v) =>
             v == null || v.isEmpty ? "Tidak boleh kosong" : null,
