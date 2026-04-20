@@ -4,15 +4,10 @@ import '../Databases/database.dart';
 import '../Models/AppConfig.dart';
 
 class ConfigRepository {
-
   static Future<void> save(AppConfig config) async {
     final db = await AppDatabase.instance();
 
-    await db.insert(
-      "config",
-      config.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await db.update("config", config.toMap(), where: "id = ?", whereArgs: [1]);
   }
 
   static Future<AppConfig> get() async {

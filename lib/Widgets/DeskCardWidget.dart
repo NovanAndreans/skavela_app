@@ -35,8 +35,8 @@ class DeskCardWidget extends StatelessWidget {
                   margin: EdgeInsets.all(3),
                   child: Image.asset(
                     appImages.logoMalang,
-                    width: 45,
-                    height: 55,
+                    width: 35,
+                    height: 45,
                   ),
                 ),
                 Expanded(
@@ -46,7 +46,7 @@ class DeskCardWidget extends StatelessWidget {
                         config.deskTitle,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                          fontSize: 13,
+                          fontSize: 11,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -54,7 +54,7 @@ class DeskCardWidget extends StatelessWidget {
                       Text(
                         config.schoolName,
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 12,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -64,7 +64,7 @@ class DeskCardWidget extends StatelessWidget {
 
                 Container(
                   margin: EdgeInsets.all(3),
-                  child: Image.asset(appImages.logoSMK, width: 48, height: 51),
+                  child: Image.asset(appImages.logoSMK, width: 38, height: 41),
                 ),
               ],
             ),
@@ -136,7 +136,7 @@ class DeskCardWidget extends StatelessWidget {
           text,
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: 17,
+            fontSize: 13,
             fontWeight: bold ? FontWeight.bold : FontWeight.normal,
             color: color ?? Colors.black,
           ),
@@ -149,7 +149,7 @@ class DeskCardWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(6),
       color: Colors.grey.shade300,
-      child: Text(text, style: const TextStyle(fontSize: 12)),
+      child: Text(text, style: const TextStyle(fontSize: 10)),
     );
   }
 
@@ -159,7 +159,7 @@ class DeskCardWidget extends StatelessWidget {
       color: background,
       child: Text(
         text,
-        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
       ),
     );
   }
