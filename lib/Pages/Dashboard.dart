@@ -38,7 +38,7 @@ class _DashboardPageState extends State<DashboardPage> {
       totalStudents = students.length;
       totalClasses = classes.length;
       totalMajors = majors.length;
-      activities = recent.take(5).toList(); // ambil 5 terbaru
+      activities = recent.take(9).toList(); // ambil 5 terbaru
     });
   }
 
