@@ -99,8 +99,22 @@ class _ActivityPageState extends State<ActivityPage> {
                     onSelected: (value) async {
                       if (value == "clear_all") {
                         await ActivityRepository.deleteAll();
+                        
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Berhasil Menghapus semua Riwayat"),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
                       } else if (value == "keep_50") {
                         await ActivityRepository.keepLatest(50);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Berhasil Menghapus Riwayat, dengan menyimpan 50 riwayat"),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
                       }
                       load();
                     },

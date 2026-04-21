@@ -53,6 +53,13 @@ class _ExamCardPageState extends State<ExamCardPage> {
       await Printing.layoutPdf(onLayout: (format) => pdf);
     } finally {
       AppLoading.hide();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Berhasil Mencetak"),
+          backgroundColor: Colors.green,
+        ),
+      );
     }
   }
 
@@ -99,6 +106,13 @@ class _ExamCardPageState extends State<ExamCardPage> {
                   await Printing.layoutPdf(onLayout: (format) => pdf);
                 } finally {
                   AppLoading.hide();
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Berhasil Mencetak"),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
                 }
               },
               child: const Text("Generate"),
@@ -133,10 +147,9 @@ class _ExamCardPageState extends State<ExamCardPage> {
                 children: [
                   Text(
                     "Cetak Kartu Ujian",
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineMedium
-                        ?.copyWith(fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
 
                   /// BUTTON RIGHT
@@ -154,7 +167,7 @@ class _ExamCardPageState extends State<ExamCardPage> {
                         label: const Text("Cetak"),
                       ),
                     ],
-                  )
+                  ),
                 ],
               ),
 

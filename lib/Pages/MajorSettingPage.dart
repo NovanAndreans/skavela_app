@@ -257,11 +257,25 @@ class _MajorSettingPageState extends State<MajorSettingPage> {
                         "MAJOR",
                         "Tambah ${newMajor.code}",
                       );
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Berhasil Menambahkan ${newMajor.code}"),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
                     } else {
                       await MajorRepository.update(newMajor);
                       await ActivityRepository.log(
                         "MAJOR",
                         "Update ${newMajor.code}",
+                      );
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Berhasil Mengupdate ${newMajor.code}"),
+                          backgroundColor: Colors.green,
+                        ),
                       );
                     }
 
@@ -301,6 +315,13 @@ class _MajorSettingPageState extends State<MajorSettingPage> {
     if (confirm == true) {
       await MajorRepository.delete(m.id!);
       load();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Berhasil Menghapus Jurusan"),
+          backgroundColor: Colors.green,
+        ),
+      );
     }
   }
 

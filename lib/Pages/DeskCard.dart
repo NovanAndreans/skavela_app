@@ -80,6 +80,13 @@ class _DeskCardPageState extends State<DeskCardPage> {
                   "EXPORT_DESK_CARD",
                   "Generate kartu meja kelas $selectedClass",
                 );
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Berhasil Mencetak"),
+                    backgroundColor: Colors.green,
+                  ),
+                );
               },
               child: const Text("Generate"),
             ),
@@ -96,6 +103,12 @@ class _DeskCardPageState extends State<DeskCardPage> {
       await DeskCardPdfService.generate(students);
     } finally {
       AppLoading.hide();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Berhasil Mencetak"),
+          backgroundColor: Colors.green,
+        ),
+      );
     }
   }
 
@@ -123,10 +136,9 @@ class _DeskCardPageState extends State<DeskCardPage> {
                 children: [
                   Text(
                     "Kartu Meja",
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineMedium
-                        ?.copyWith(fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
 
                   Row(
@@ -143,7 +155,7 @@ class _DeskCardPageState extends State<DeskCardPage> {
                         label: const Text("Cetak"),
                       ),
                     ],
-                  )
+                  ),
                 ],
               ),
 
