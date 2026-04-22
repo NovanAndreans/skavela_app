@@ -44,11 +44,9 @@ class DeskCardPdfService {
         const rows = 4;
         const spacing = 4.0;
 
-        final cardWidth =
-            (usableWidth - ((cols - 1) * spacing)) / cols;
+        final cardWidth = (usableWidth - ((cols - 1) * spacing)) / cols;
 
-        final cardHeight =
-            (usableHeight - ((rows - 1) * spacing)) / rows;
+        final cardHeight = (usableHeight - ((rows - 1) * spacing)) / rows;
 
         /// === SPLIT PER 12 STUDENTS ===
         for (int i = 0; i < students.length; i += 12) {
@@ -70,13 +68,7 @@ class DeskCardPdfService {
                         decoration: pw.BoxDecoration(
                           border: pw.Border.all(width: 1),
                         ),
-                        child: _card(
-                          s,
-                          logo1,
-                          logo2,
-                          config,
-                          majors,
-                        ),
+                        child: _card(s, logo1, logo2, config, majors),
                       );
                     }).toList(),
                   ),
@@ -119,10 +111,7 @@ class DeskCardPdfService {
                       fontWeight: pw.FontWeight.bold,
                     ),
                   ),
-                  pw.Text(
-                    config.year,
-                    style: const pw.TextStyle(fontSize: 7),
-                  ),
+                  pw.Text(config.year, style: const pw.TextStyle(fontSize: 7)),
                   pw.Text(
                     config.schoolName,
                     style: pw.TextStyle(
@@ -151,12 +140,7 @@ class DeskCardPdfService {
             children: [
               _box(s.ruang, flex: 2, bold: true),
               _box(s.kelas, flex: 3, bold: true),
-              _box(
-                s.noUrut,
-                flex: 2,
-                color: PdfColors.red,
-                bold: true,
-              ),
+              _box(s.noUrut, flex: 2, color: PdfColors.red, bold: true),
             ],
           ),
 
@@ -168,22 +152,20 @@ class DeskCardPdfService {
               border: pw.TableBorder.all(width: 1),
               columnWidths: {
                 0: const pw.FixedColumnWidth(50),
-                1: const pw.FlexColumnWidth(),
+                1: const pw.FixedColumnWidth(8),
+                2: const pw.FlexColumnWidth(),
               },
               children: [
                 pw.TableRow(
-                  children: [
-                    _label("Nama"),
-                    _value(s.name),
-                  ],
+                  children: [_label("Nama"), _colon(":"), _value(s.name)],
                 ),
                 pw.TableRow(
                   children: [
                     _label("Jurusan"),
+                    _colon(":"),
                     _value(
                       s.jurusan,
-                      background:
-                          PdfColor.fromInt(major.colorValue),
+                      background: PdfColor.fromInt(major.colorValue),
                     ),
                   ],
                 ),
@@ -210,8 +192,7 @@ class DeskCardPdfService {
           text,
           style: pw.TextStyle(
             fontSize: 8,
-            fontWeight:
-                bold ? pw.FontWeight.bold : pw.FontWeight.normal,
+            fontWeight: bold ? pw.FontWeight.bold : pw.FontWeight.normal,
             color: color,
           ),
         ),
@@ -223,10 +204,15 @@ class DeskCardPdfService {
     return pw.Container(
       padding: const pw.EdgeInsets.all(3),
       color: PdfColors.grey300,
-      child: pw.Text(
-        text,
-        style: const pw.TextStyle(fontSize: 7),
-      ),
+      child: pw.Text(text, style: const pw.TextStyle(fontSize: 7)),
+    );
+  }
+
+  static pw.Widget _colon(String text) {
+    return pw.Container(
+      padding: const pw.EdgeInsets.fromLTRB(3, 3, 2, 3),
+      color: PdfColors.grey300,
+      child: pw.Text(text, style: const pw.TextStyle(fontSize: 7)),
     );
   }
 
@@ -236,10 +222,9 @@ class DeskCardPdfService {
       color: background,
       child: pw.Text(
         text,
-        style: pw.TextStyle(
-          fontSize: 8,
-          fontWeight: pw.FontWeight.bold,
-        ),
+        maxLines: 1,
+        overflow: pw.TextOverflow.clip,
+        style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
       ),
     );
   }

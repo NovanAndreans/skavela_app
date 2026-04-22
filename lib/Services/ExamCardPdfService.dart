@@ -170,7 +170,7 @@ class ExamCardPdfService {
                         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                         children: [
                           pw.Text(
-                            "Ruang: ${s.ruang}",
+                            "${s.ruang}",
                             style: const pw.TextStyle(fontSize: 9),
                           ),
                           pw.Column(
@@ -208,7 +208,8 @@ class ExamCardPdfService {
                             pw.Table(
                               columnWidths: {
                                 0: const pw.FixedColumnWidth(90),
-                                1: const pw.FlexColumnWidth(),
+                                1: const pw.FixedColumnWidth(8),
+                                2: const pw.FlexColumnWidth(),
                               },
                               children: [
                                 _row("Nama", s.name),
@@ -266,8 +267,17 @@ class ExamCardPdfService {
           child: pw.Text(label, style: const pw.TextStyle(fontSize: 8)),
         ),
         pw.Padding(
+          padding: pw.EdgeInsets.all(1.5),
+          child: pw.Text(":", style: pw.TextStyle(fontSize: 8)),
+        ),
+        pw.Padding(
           padding: const pw.EdgeInsets.all(3),
-          child: pw.Text(value, style: const pw.TextStyle(fontSize: 8)),
+          child: pw.Text(
+            value,
+            maxLines: 1,
+            overflow: pw.TextOverflow.clip,
+            style: const pw.TextStyle(fontSize: 8),
+          ),
         ),
       ],
     );

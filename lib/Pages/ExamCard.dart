@@ -123,6 +123,65 @@ class _ExamCardPageState extends State<ExamCardPage> {
     );
   }
 
+  void openFilterDialogRoom() async {
+    String? selectedRoom;
+    final rooms = await StudentRepository.getRooms();
+
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: const Text("Cetak per Ruang Ujian"),
+          content: DropdownButtonFormField<String>(
+            hint: const Text("Pilih Ruang Ujian"),
+            value: selectedRoom,
+            items: rooms.map((c) {
+              return DropdownMenuItem(value: c, child: Text(c));
+            }).toList(),
+            onChanged: (v) => selectedRoom = v,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Batal"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final filtered = await StudentRepository.filterRoom(
+                  roomName: selectedRoom,
+                );
+
+                Navigator.pop(context);
+
+                final pdf = await ExamCardPdfService.generate(filtered);
+
+                await ActivityRepository.log(
+                  "EXPORT_EXAM_CARD",
+                  "Generate kartu ujian di $selectedRoom",
+                );
+
+                try {
+                  AppLoading.show("Mengekspor...");
+                  await Printing.layoutPdf(onLayout: (format) => pdf);
+                } finally {
+                  AppLoading.hide();
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Berhasil Mencetak"),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              },
+              child: const Text("Generate"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   /// ================= RESPONSIVE GRID =================
   int getCrossAxisCount(double width) {
     if (width > 1400) return 4;
@@ -159,6 +218,12 @@ class _ExamCardPageState extends State<ExamCardPage> {
                         onPressed: openFilterDialog,
                         icon: const Icon(Icons.filter_alt),
                         label: const Text("Cetak per Kelas"),
+                      ),
+                      const SizedBox(width: 12),
+                      ElevatedButton.icon(
+                        onPressed: openFilterDialogRoom,
+                        icon: const Icon(Icons.filter_alt),
+                        label: const Text("Cetak per Ruang"),
                       ),
                       const SizedBox(width: 12),
                       ElevatedButton.icon(

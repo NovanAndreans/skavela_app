@@ -111,7 +111,7 @@ class ExamCardWidget extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  "Ruang : ${student.ruang}",
+                                  "${student.ruang}",
                                   style: const TextStyle(fontSize: 12),
                                 ),
                                 Column(
@@ -203,7 +203,12 @@ class ExamCardWidget extends StatelessWidget {
         ),
         Padding(
           padding: const EdgeInsets.all(3.9),
-          child: Text(value, style: const TextStyle(fontSize: 11)),
+          child: Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.clip,
+            style: const TextStyle(fontSize: 11),
+          ),
         ),
       ],
     );

@@ -96,6 +96,58 @@ class _DeskCardPageState extends State<DeskCardPage> {
     );
   }
 
+  void openFilterDialogRoom() async {
+    String? selectedRoom;
+    final rooms = await StudentRepository.getRooms();
+
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: const Text("Cetak per Ruang Ujian"),
+          content: DropdownButtonFormField<String>(
+            hint: const Text("Pilih Ruangan"),
+            value: selectedRoom,
+            items: rooms.map((c) {
+              return DropdownMenuItem(value: c, child: Text(c));
+            }).toList(),
+            onChanged: (v) => selectedRoom = v,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Batal"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final filtered = await StudentRepository.filterRoom(
+                  roomName: selectedRoom,
+                );
+
+                Navigator.pop(context);
+
+                await DeskCardPdfService.generate(filtered);
+
+                await ActivityRepository.log(
+                  "EXPORT_DESK_CARD",
+                  "Generate kartu meja kelas per $selectedRoom",
+                );
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Berhasil Mencetak"),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              },
+              child: const Text("Generate"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   /// ================= EXPORT =================
   void exportAll() async {
     try {
@@ -147,6 +199,12 @@ class _DeskCardPageState extends State<DeskCardPage> {
                         onPressed: openFilterDialog,
                         icon: const Icon(Icons.filter_alt),
                         label: const Text("Cetak per Kelas"),
+                      ),
+                      const SizedBox(width: 12),
+                      ElevatedButton.icon(
+                        onPressed: openFilterDialogRoom,
+                        icon: const Icon(Icons.filter_alt),
+                        label: const Text("Cetak per Ruangan"),
                       ),
                       const SizedBox(width: 12),
                       ElevatedButton.icon(

@@ -98,16 +98,22 @@ class DeskCardWidget extends StatelessWidget {
           Table(
             border: TableBorder.all(color: Colors.black),
             columnWidths: const {
-              0: FixedColumnWidth(120),
-              1: FlexColumnWidth(),
+              0: FixedColumnWidth(80),
+              1: FixedColumnWidth(8),
+              2: FlexColumnWidth(),
             },
             children: [
               TableRow(
-                children: [_label("Nama Peserta"), _value(student.name)],
+                children: [
+                  _label("Nama Peserta"),
+                  colon(":"),
+                  _value(student.name),
+                ],
               ),
               TableRow(
                 children: [
-                  _label("Konsli / Kelas"),
+                  _label("Jurusan"),
+                  colon(":"),
                   _value(
                     student.jurusan,
                     background: getMajorColor(majors, student.jurusan),
@@ -153,12 +159,22 @@ class DeskCardWidget extends StatelessWidget {
     );
   }
 
+  static Widget colon(String text) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(3, 6, 6, 6),
+      color: Colors.grey.shade300,
+      child: Text(text, style: const TextStyle(fontSize: 10)),
+    );
+  }
+
   static Widget _value(String text, {Color? background}) {
     return Container(
       padding: const EdgeInsets.all(6),
       color: background,
       child: Text(
         text,
+        maxLines: 1,
+        overflow: TextOverflow.clip,
         style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
       ),
     );

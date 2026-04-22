@@ -78,6 +78,16 @@ class StudentRepository {
     return result.map((e) => e["kelas"] as String).toList();
   }
 
+  static Future<List<String>> getRooms() async {
+    final db = await AppDatabase.instance();
+
+    final result = await db.rawQuery(
+      "SELECT DISTINCT ruang FROM students ORDER BY ruang ASC",
+    );
+
+    return result.map((e) => e["ruang"] as String).toList();
+  }
+
   static Future<List<StudentModel>> filter({
     String? className,
     String? majorCode,
@@ -112,6 +122,28 @@ class StudentRepository {
       where: where.isEmpty ? null : where.join(" AND "),
       whereArgs: args,
       orderBy: "CAST(REPLACE(noUrut, 'No. Urut ', '') AS INTEGER) ASC",
+    );
+
+    return result.map((e) => StudentModel.fromMap(e)).toList();
+  }
+
+  static Future<List<StudentModel>> filterRoom({
+    String? roomName
+  }) async {
+    final db = await AppDatabase.instance();
+
+    List<String> where = [];
+    List<dynamic> args = [];
+
+    if (roomName != null && roomName.isNotEmpty) {
+      where.add("ruang = ?");
+      args.add(roomName);
+    }
+
+    final result = await db.query(
+      "students",
+      where: where.isEmpty ? null : where.join(" AND "),
+      whereArgs: args,
     );
 
     return result.map((e) => StudentModel.fromMap(e)).toList();
