@@ -246,28 +246,58 @@ class _ExamCardPageState extends State<ExamCardPage> {
                     color: Colors.grey[200],
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: GridView.builder(
-                    itemCount: students.length,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: crossAxisCount,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: 260 / 170,
-                    ),
-                    itemBuilder: (_, i) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: Colors.white,
+                  child: students.isEmpty
+                      /// ================= EMPTY STATE =================
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.assignment_outlined,
+                                size: 80,
+                                color: Colors.grey[400],
+                              ),
+                              const SizedBox(height: 16),
+                              const Text(
+                                "Belum ada data kartu ujian",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              const Text(
+                                "Silakan tambahkan data siswa terlebih dahulu",
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        )
+                      /// ================= ORIGINAL GRID (TIDAK DIUBAH) =================
+                      : GridView.builder(
+                          itemCount: students.length,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: crossAxisCount,
+                                crossAxisSpacing: 12,
+                                mainAxisSpacing: 12,
+                                childAspectRatio: 260 / 170,
+                              ),
+                          itemBuilder: (_, i) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: Colors.white,
+                              ),
+                              child: ExamCardWidget(
+                                student: students[i],
+                                config: config,
+                                majors: majors,
+                              ),
+                            );
+                          },
                         ),
-                        child: ExamCardWidget(
-                          student: students[i],
-                          config: config,
-                          majors: majors,
-                        ),
-                      );
-                    },
-                  ),
                 ),
               ),
             ],

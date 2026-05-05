@@ -227,28 +227,58 @@ class _DeskCardPageState extends State<DeskCardPage> {
                     color: Colors.grey[200],
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: GridView.builder(
-                    itemCount: students.length,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: crossAxisCount,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                      childAspectRatio: 1.7,
-                    ),
-                    itemBuilder: (context, index) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
+                  child: students.isEmpty
+                      /// ================= EMPTY STATE =================
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.event_seat_outlined,
+                                size: 80,
+                                color: Colors.grey[400],
+                              ),
+                              const SizedBox(height: 16),
+                              const Text(
+                                "Belum ada Data kartu meja",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              const Text(
+                                "Data siswa belum tersedia untuk ditampilkan",
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        )
+                      /// ================= ORIGINAL GRID (TIDAK DIUBAH) =================
+                      : GridView.builder(
+                          itemCount: students.length,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: crossAxisCount,
+                                crossAxisSpacing: 16,
+                                mainAxisSpacing: 16,
+                                childAspectRatio: 1.7,
+                              ),
+                          itemBuilder: (context, index) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: DeskCardWidget(
+                                student: students[index],
+                                config: config,
+                                majors: majors,
+                              ),
+                            );
+                          },
                         ),
-                        child: DeskCardWidget(
-                          student: students[index],
-                          config: config,
-                          majors: majors,
-                        ),
-                      );
-                    },
-                  ),
                 ),
               ),
             ],

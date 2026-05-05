@@ -234,6 +234,7 @@ class _StudentPageState extends State<StudentPage> {
                             selectedUsernames.toList(),
                           );
 
+                          await ActivityRepository.log("STUDENT", "Menghapus ${selectedUsernames.length} Siswa");
                           setState(() {
                             selectedUsernames.clear();
                             isAllSelected = false;

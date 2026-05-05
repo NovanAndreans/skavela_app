@@ -9,8 +9,10 @@ class AppDatabase {
   static Future<Database> instance() async {
     if (_db != null) return _db!;
 
-    final dir = await getApplicationDocumentsDirectory();
+    final dir = await getApplicationSupportDirectory();
     final path = join(dir.path, "school_admin.db");
+
+    print(dir.path);
 
     _db = await openDatabase(
       path,
