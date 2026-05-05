@@ -111,7 +111,7 @@ class ExamCardWidget extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  "${student.ruang}",
+                                  student.ruang,
                                   style: const TextStyle(fontSize: 12),
                                 ),
                                 Column(

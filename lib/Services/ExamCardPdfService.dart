@@ -170,7 +170,7 @@ class ExamCardPdfService {
                         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                         children: [
                           pw.Text(
-                            "${s.ruang}",
+                            s.ruang,
                             style: const pw.TextStyle(fontSize: 9),
                           ),
                           pw.Column(
