@@ -56,7 +56,7 @@ class AppDatabase {
 
         await db.insert("majors", {
           "code": "DPB",
-          "name": "Desain Produksi Busana",
+          "name": "Desain dan Produksi Busana",
           "color": Colors.pink.value,
         });
 
@@ -86,8 +86,8 @@ class AppDatabase {
 
         await db.insert("majors", {
           "code": "PSPT",
-          "name": "Produksi Siaran Program Televisi",
-          "color": Colors.orange.value,
+          "name": "Produksi dan Siaran Program Televisi",
+          "color": Colors.red.value,
         });
 
         await db.insert("majors", {
