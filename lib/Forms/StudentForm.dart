@@ -3,6 +3,8 @@ import 'package:skavela_app/Repositories/StudentRepository.dart';
 
 import '../Models/StudentModel.dart';
 import '../Repositories/ActivityRepository.dart';
+import '../Repositories/MajorRepository.dart';
+import '../Models/MajorModel.dart';
 import '../Widgets/CustomInputs.dart';
 
 class StudentFormDialog extends StatefulWidget {
@@ -20,28 +22,39 @@ class _StudentFormDialogState extends State<StudentFormDialog> {
   final nameController = TextEditingController();
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
-  final jurusanController = TextEditingController();
   final waktu1Controller = TextEditingController();
   final waktu2Controller = TextEditingController();
   final kelasController = TextEditingController();
   final noUrutController = TextEditingController();
   final ruangController = TextEditingController();
 
+  List<Major> majors = [];
+  String? selectedJurusan;
+
   @override
   void initState() {
     super.initState();
+    loadMajors();
 
     if (widget.student != null) {
       nameController.text = widget.student!.name;
       usernameController.text = widget.student!.username;
       passwordController.text = widget.student!.password;
-      jurusanController.text = widget.student!.jurusan;
       waktu1Controller.text = widget.student!.waktu1;
       waktu2Controller.text = widget.student!.waktu2;
       kelasController.text = widget.student!.kelas;
       noUrutController.text = widget.student!.noUrut;
       ruangController.text = widget.student!.ruang;
+
+      selectedJurusan = widget.student!.jurusan;
     }
+  }
+
+  Future<void> loadMajors() async {
+    final data = await MajorRepository.getAll();
+    setState(() {
+      majors = data;
+    });
   }
 
   @override
@@ -71,16 +84,40 @@ class _StudentFormDialogState extends State<StudentFormDialog> {
                   Row(
                     children: [
                       Expanded(
-                        child: CustomInputText(usernameController, 'Username'),
+                        child: CustomInputText(
+                            usernameController, 'Username'),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: CustomInputText(passwordController, 'Password'),
+                        child:
+                            CustomInputText(passwordController, 'Password'),
                       ),
                     ],
                   ),
 
-                  CustomInputText(jurusanController, 'Jurusan'),
+                  /// 🔽 DROPDOWN JURUSAN (NEW)
+                  DropdownButtonFormField<String>(
+                    value: selectedJurusan,
+                    decoration: const InputDecoration(
+                      labelText: 'Jurusan',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: majors.map((m) {
+                      return DropdownMenuItem(
+                        value: m.name,
+                        child: Text("${m.code} - ${m.name}"),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedJurusan = value;
+                      });
+                    },
+                    validator: (value) =>
+                        value == null ? 'Jurusan wajib dipilih' : null,
+                  ),
+
+                  const SizedBox(height: 12),
 
                   Row(
                     children: [
@@ -104,15 +141,18 @@ class _StudentFormDialogState extends State<StudentFormDialog> {
                     children: [
                       Expanded(
                         flex: 2,
-                        child: CustomInputText(kelasController, 'Kelas'),
+                        child:
+                            CustomInputText(kelasController, 'Kelas'),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: CustomInputText(noUrutController, 'No Urut'),
+                        child: CustomInputText(
+                            noUrutController, 'No Urut'),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: CustomInputText(ruangController, 'Ruang'),
+                        child:
+                            CustomInputText(ruangController, 'Ruang'),
                       ),
                     ],
                   ),
@@ -134,7 +174,7 @@ class _StudentFormDialogState extends State<StudentFormDialog> {
                               name: nameController.text,
                               username: usernameController.text,
                               password: passwordController.text,
-                              jurusan: jurusanController.text,
+                              jurusan: selectedJurusan!,
                               kelas: kelasController.text,
                               noUrut: noUrutController.text,
                               ruang: ruangController.text,

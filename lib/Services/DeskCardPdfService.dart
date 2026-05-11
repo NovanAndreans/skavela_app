@@ -93,7 +93,7 @@ class DeskCardPdfService {
     final major = majors.firstWhere((m) => m.name == s.jurusan);
 
     return pw.Padding(
-      padding: const pw.EdgeInsets.all(2),
+      padding: const pw.EdgeInsets.all(4),
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.stretch,
         children: [
@@ -107,15 +107,15 @@ class DeskCardPdfService {
                   pw.Text(
                     config.deskTitle,
                     style: pw.TextStyle(
-                      fontSize: 8,
+                      fontSize: 11,
                       fontWeight: pw.FontWeight.bold,
                     ),
                   ),
-                  pw.Text(config.year, style: const pw.TextStyle(fontSize: 7)),
+                  pw.Text(config.year, style: const pw.TextStyle(fontSize: 10)),
                   pw.Text(
                     config.schoolName,
                     style: pw.TextStyle(
-                      fontSize: 8,
+                      fontSize: 11,
                       fontWeight: pw.FontWeight.bold,
                     ),
                   ),
@@ -125,15 +125,15 @@ class DeskCardPdfService {
             ],
           ),
 
-          pw.Divider(),
+          pw.Divider(height: 10),
 
           pw.Text(
             config.examLink,
             textAlign: pw.TextAlign.center,
-            style: const pw.TextStyle(fontSize: 8),
+            style: const pw.TextStyle(fontSize: 11),
           ),
 
-          pw.Divider(),
+          pw.Divider(height: 10),
 
           /// ROW INFO
           pw.Row(
@@ -191,7 +191,7 @@ class DeskCardPdfService {
         child: pw.Text(
           text,
           style: pw.TextStyle(
-            fontSize: 8,
+            fontSize: 10,
             fontWeight: bold ? pw.FontWeight.bold : pw.FontWeight.normal,
             color: color,
           ),
@@ -204,7 +204,7 @@ class DeskCardPdfService {
     return pw.Container(
       padding: const pw.EdgeInsets.all(3),
       color: PdfColors.grey300,
-      child: pw.Text(text, style: const pw.TextStyle(fontSize: 7)),
+      child: pw.Text(text, style: const pw.TextStyle(fontSize: 9)),
     );
   }
 
@@ -212,7 +212,7 @@ class DeskCardPdfService {
     return pw.Container(
       padding: const pw.EdgeInsets.fromLTRB(3, 3, 2, 3),
       color: PdfColors.grey300,
-      child: pw.Text(text, style: const pw.TextStyle(fontSize: 7)),
+      child: pw.Text(text, style: const pw.TextStyle(fontSize: 9)),
     );
   }
 
@@ -224,7 +224,7 @@ class DeskCardPdfService {
         text,
         maxLines: 1,
         overflow: pw.TextOverflow.clip,
-        style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
+        style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold),
       ),
     );
   }

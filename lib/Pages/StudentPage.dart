@@ -104,12 +104,12 @@ class _StudentPageState extends State<StudentPage> {
               const Spacer(),
               ElevatedButton.icon(
                 onPressed: () async {
-                  final result = await showDialog(
+                  await showDialog(
                     context: context,
                     builder: (_) => const StudentFormDialog(),
                   );
 
-                  if (result == true) refresh();
+                  refresh();
                 },
                 icon: const Icon(Icons.add),
                 label: const Text('Tambah'),
